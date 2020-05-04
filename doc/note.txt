@@ -73,5 +73,22 @@ $ git push --set-upstream origin support_mecanum
 git checkout master
 git merge support_mecanum
 
+======================================
+quick change pattern:
+$ git checkout -b add_git_basic_note
+
+change something....
+
+$ git commit -a -m "add git basic"
+or 
+$ git add doc/note.txt
+$ git commit -m "add git basic"
+
+$ git checkout master
+
+$ git marge add_git_basic_note
+
+$ git branch -d add_git_basic_note
+======================================
 
 
