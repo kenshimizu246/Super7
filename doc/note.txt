@@ -47,3 +47,31 @@
  
 
 
+git tips:
+
+Create branch and checkout it.
+$ git checkout -b support_mecanum
+This is the shortcut for following
+  $ git branch support_mecanum
+  $ git checkout support_mecanum
+
+show branch list
+$ git branch
+
+switch branch to master
+$ git checkout master
+
+switch branch to support_mecanum
+$ git checkout support_mecanum
+
+Branch 'support_mecanum' set up to track remote branch 'support_mecanum' from 'origin'
+To fetch and merge from remote branch. This is for two 
+$ git branch -u origin/support_mecanum
+
+$ git push --set-upstream origin support_mecanum
+
+git checkout master
+git merge support_mecanum
+
+
+
