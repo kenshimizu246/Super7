@@ -53,7 +53,7 @@ using websocketpp::lib::condition_variable;
 #include "worker/gy271_worker.hpp"
 #include "message.hpp"
 #include "pca9685.hpp"
-#include "njm2670d2.hpp"
+#include "mecanum_wheels_driver.hpp"
 #include "command.hpp"
 
 #include <wiringPi.h>
@@ -117,11 +117,11 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     mutex m_connection_lock;
     condition_variable m_action_cond;
 
-    vl53l0x_worker vl53l0x{0};
-    hcsr04_worker hcsr04{28, 29};
-    gy271_worker gy271;
+    //vl53l0x_worker vl53l0x{0};
+    //hcsr04_worker hcsr04{28, 29};
+    //gy271_worker gy271;
     pca9685 servo;
-    njm2670d2 motorctrl{21,22,23,24};
+    mecanum_wheels_driver motorctrl{24,25,23,22,28,29,27,26};
     command_factory cmd_factory{servo, motorctrl};
 };
 
@@ -360,13 +360,13 @@ void Alexo::run(){
   m_server.start_accept();
 
   cout << "Alexo::run() ... before start vl53l0x\n" << endl;
-  vl53l0x.add((*this));
-  hcsr04.add((*this));
-  gy271.add((*this));
+  //vl53l0x.add((*this));
+  //hcsr04.add((*this));
+  //gy271.add((*this));
 
-  vl53l0x.start();
-  hcsr04.start();
-  gy271.start();
+  //vl53l0x.start();
+  //hcsr04.start();
+  //gy271.start();
 
   // Start the ASIO io_service run loop
   cout << "Alexo::run() ... Start the ASIO io_service run loop\n" << endl;

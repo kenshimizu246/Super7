@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include "pca9685.hpp"
-#include "njm2670d2.hpp"
+#include "mecanum_wheels_driver.hpp"
 
 #ifndef _command_hpp
 #define _command_hpp
@@ -17,6 +17,12 @@ enum drive_command_type {
   RIGHT,
   LEFT,
   STOP,
+  FORWARD_RIGHT,
+  FORWARD_LEFT,
+  BACKWARD_RIGHT,
+  BACKWARD_LEFT,
+  SLIDE_RIGHT,
+  SLIDE_LEFT,
   AUTO
 };
 
@@ -69,9 +75,15 @@ public:
   const std::string kLEFT = "LEFT";
   const std::string kSTOP = "STOP";
   const std::string kAUTO = "AUTO";
+  const std::string kFORWARD_RIGHT = "FORWARD_RIGHT";
+  const std::string kFORWARD_LEFT = "FORWARD_LEFT";
+  const std::string kBACKWARD_RIGHT = "BACKWARD_RIGHT";
+  const std::string kBACKWARD_LEFT = "BACKWARD_LEFT";
+  const std::string kSLIDE_RIGHT = "SLIDE_RIGHT";
+  const std::string kSLIDE_LEFT = "SLIDE_LEFT";
 
-  drive_command(njm2670d2& m, drive_command_type s): motor(m), type(s) {}
-  drive_command(njm2670d2& m, std::string& str): motor(m) {
+  drive_command(mecanum_wheels_driver& m, drive_command_type s): motor(m), type(s) {}
+  drive_command(mecanum_wheels_driver& m, std::string& str): motor(m) {
     if (str == kFORWARD) {
       type = drive_command_type::FORWARD;
     } else if (str == kBACKWARD) {
@@ -82,6 +94,18 @@ public:
       type = drive_command_type::LEFT;
     } else if (str == kSTOP) {
       type = drive_command_type::STOP;
+    } else if (str == kFORWARD_RIGHT) {
+      type = drive_command_type::FORWARD_RIGHT;
+    } else if (str == kFORWARD_LEFT) {
+      type = drive_command_type::FORWARD_LEFT;
+    } else if (str == kBACKWARD_RIGHT) {
+      type = drive_command_type::BACKWARD_RIGHT;
+    } else if (str == kBACKWARD_LEFT) {
+      type = drive_command_type::BACKWARD_LEFT;
+    } else if (str == kSLIDE_RIGHT) {
+      type = drive_command_type::SLIDE_RIGHT;
+    } else if (str == kSLIDE_LEFT) {
+      type = drive_command_type::SLIDE_LEFT;
     } else if (str == kAUTO) {
       type = drive_command_type::AUTO;
     } else {
@@ -110,13 +134,31 @@ public:
     }else if (getType() == drive_command_type::STOP){
       std::cout << "stop selected!" << std::endl;
       motor.stop();
+    }else if (getType() == drive_command_type::FORWARD_RIGHT){
+      std::cout << "forward right selected!" << std::endl;
+      motor.forward_right();
+    }else if (getType() == drive_command_type::FORWARD_LEFT){
+      std::cout << "forward left selected!" << std::endl;
+      motor.forward_left();
+    }else if (getType() == drive_command_type::BACKWARD_RIGHT){
+      std::cout << "backward right selected!" << std::endl;
+      motor.backward_right();
+    }else if (getType() == drive_command_type::BACKWARD_LEFT){
+      std::cout << "backward left selected!" << std::endl;
+      motor.backward_left();
+    }else if (getType() == drive_command_type::SLIDE_RIGHT){
+      std::cout << "slide right selected!" << std::endl;
+      motor.slide_right();
+    }else if (getType() == drive_command_type::SLIDE_LEFT){
+      std::cout << "slide left selected!" << std::endl;
+      motor.slide_left();
     }else if (getType() == drive_command_type::AUTO){
       std::cout << "else selected!" << std::endl;
     }
   }
 
 private:
-  njm2670d2& motor;
+  mecanum_wheels_driver& motor;
   drive_command_type type;
 };
 
@@ -152,11 +194,11 @@ private:
 
 class command_factory {
 public:
-  command_factory(pca9685& s, njm2670d2& m): servo(s), motor(m) {}
+  command_factory(pca9685& s, mecanum_wheels_driver& m): servo(s), motor(m) {}
   void set(pca9685& s){
     servo = s;
   }
-  void set(njm2670d2& m){
+  void set(mecanum_wheels_driver& m){
     motor = m;
   }
   std::shared_ptr<command> createDriveCommand(std::string& s){
@@ -170,7 +212,7 @@ public:
   }
 private:
   pca9685& servo;
-  njm2670d2& motor;
+  mecanum_wheels_driver& motor;
 };
 
 #endif

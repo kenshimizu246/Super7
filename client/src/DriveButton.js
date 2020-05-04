@@ -27,11 +27,6 @@ function Toggle(handlerOnClick, command, label, initVal){
       <div>{value}</div>
     </div>
   );
-//        <input type="range"
-//          min={minVal} max={maxVal} step={stepVal} defaultValue={initVal}
-//          onClick={() => {handlerWrapper();}}
-//          onChange={(e) => {setValue(e.target.value);}}
-//        />
 }
 
 export default Toggle;

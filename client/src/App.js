@@ -121,10 +121,17 @@ function App() {
   let hcsr04 = Distance(conn, 'hcsr04', 0, 'HCSR04', 'Ultrasonic Sensor');
   let headingXYZ = Compass(conn, 'gy271', 0, 'GY271', 'Three Axis Magnetic Field Sensor');
   let stop = DriveButton(handlerDriveButton, 'STOP', 'STOP', false);
+  let autodrive = DriveButton(handlerDriveButton, 'AUTO', 'AUTO', false);
   let forward = DriveButton(handlerDriveButton, 'FORWARD', 'FORWARD', false);
   let backward = DriveButton(handlerDriveButton, 'BACKWARD', 'BACKWARD', false);
   let left = DriveButton(handlerDriveButton, 'LEFT', 'LEFT', false);
   let right = DriveButton(handlerDriveButton, 'RIGHT', 'RIGHT', false);
+  let forward_right = DriveButton(handlerDriveButton, 'FORWARD_RIGHT', 'RIGHT', false);
+  let forward_left = DriveButton(handlerDriveButton, 'FORWARD_LEFT', 'LEFT', false);
+  let backward_right = DriveButton(handlerDriveButton, 'BACKWARD_RIGHT', 'RIGHT', false);
+  let backward_left = DriveButton(handlerDriveButton, 'BACKWARD_LEFT', 'LEFT', false);
+  let slide_right = DriveButton(handlerDriveButton, 'SLIDE_RIGHT', 'SLIDE', false);
+  let slide_left = DriveButton(handlerDriveButton, 'SLIDE_LEFT', 'SLIDE', false);
 
   return (
     <div className="App">
@@ -132,7 +139,7 @@ function App() {
      <div className="monitorControlX">
        <div className="monitorControlY">
          <div className='monitor'>
-           <img src="http://192.168.1.68:8081" alt='monitor'/>
+           <img src="http://192.168.1.90:8081" alt='monitor'/>
          </div>
          <div className="rangeCamY">
            {rangeCamY}
@@ -146,9 +153,9 @@ function App() {
        {rangeSens}
      </div>
      <div className='controllerRow'>
-       <div></div>
+       <div>{forward_left}</div>
        <div>{forward}</div>
-       <div></div>
+       <div>{forward_right}</div>
      </div>
      <div className='controllerRow'>
        <div>{left}</div>
@@ -156,9 +163,14 @@ function App() {
        <div>{right}</div>
      </div>
      <div className='controllerRow'>
-       <div></div>
+       <div>{slide_left}</div>
+       <div>{autodrive}</div>
+       <div>{slide_right}</div>
+     </div>
+     <div className='controllerRow'>
+       <div>{backward_left}</div>
        <div>{backward}</div>
-       <div></div>
+       <div>{backward_right}</div>
      </div>
      <div>
        {vl53l0x}

@@ -84,6 +84,48 @@ input {
   height: 64pt;
 }
 
+#FORWARD_LEFT {
+  background-image: url('./arrow-forward-left.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#FORWARD_RIGHT {
+  background-image: url('./arrow-forward-right.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#BACKWARD_LEFT {
+  background-image: url('./arrow-backward-left.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#BACKWARD_RIGHT {
+  background-image: url('./arrow-backward-right.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#SLIDE_LEFT {
+  background-image: url('./arrow-slide-left.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#SLIDE_RIGHT {
+  background-image: url('./arrow-slide-right.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#AUTO {
+  background-image: url('./drive-auto.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
 .monitor {
   width: 320px;
   height: 240px;
