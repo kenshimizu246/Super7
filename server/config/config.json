@@ -1,0 +1,18 @@
+{
+  "appdir": "/home/pi/project/Alexo",
+  "pidfile": "/run/Alexo.pid",
+  "logdir": "/home/pi/project/Alexo",
+  "port": 9009,
+  "daemon": false,
+  "i2c":[{
+      "address": "0x40",
+      "herts": 50
+    }
+   ],
+   "hc-sr04":[{
+       "pingTrig": 4,
+       "pingEcho": 5,
+       "interval": 1000
+     }
+   ]
+}

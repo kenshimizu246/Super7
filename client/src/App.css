@@ -1,0 +1,130 @@
+.App {
+  text-align: center;
+  width: 341px;
+  margin: 10px;
+}
+
+.title {
+  font-size: xx-large;
+  font-weight: bold;
+}
+
+.distanceBox {
+  border: solid 1px;
+  margin: 5px;
+}
+
+.distanceBoxLabel {
+  font-weight: bold;
+}
+
+.distanceBoxValue {
+  font-weight: bold;
+}
+
+.compassBox {
+  border: solid 1px;
+  margin: 5px;
+}
+
+.compassBoxLabel {
+  font-weight: bold;
+}
+
+.compassBoxValue {
+  font-weight: bold;
+}
+
+.compassXyz {
+  display: flex;
+  justify-content: space-between;
+}
+
+.compassXyz div {
+}
+
+.controllerRow {
+  display: flex;
+  justify-content: center;
+}
+
+input {
+  background-repeat: no-repeat;
+  background-size: contain, cover;
+  background-position: center;
+}
+
+#LEFT {
+  background-image: url('./arrow-left.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#RIGHT {
+  background-image: url('./arrow-right.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#FORWARD {
+  background-image: url('./arrow-forward.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#BACKWARD {
+  background-image: url('./arrow-backward.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+#STOP {
+  background-image: url('./drive-stop.svg');
+  width: 64pt;
+  height: 64pt;
+}
+
+.monitor {
+  width: 320px;
+  height: 240px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.monitorControlY {
+  display: flex;
+  padding: 0px;
+  margin: 0px;
+}
+
+.rangeCamY input {
+  -webkit-appearance: slider-vertical;
+  width: 21px;
+  height: 240px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.rangeCamX input {
+  width: 320px;
+  height: 21px;
+}
+
+.rangeSens input {
+  width: 320px;
+  height: 21px;
+}
+
+.sliderBox {
+  width: 320px;
+  height: 20px;
+  border: solid 1px;
+}
+
+.sliderHandle {
+  width: 18px;
+  height: 18px;
+  border: solid 1px;
+}
+
+

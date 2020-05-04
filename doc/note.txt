@@ -1,0 +1,49 @@
+1. install cmake
+  - go to http://cmake.org/download
+  - download cmake-x.x.x.tar.gz
+  - tar -xvzf cmake-x.x.x.tar.gz
+  - cd cmake-x.x.x.tar.gz
+  - ./configure
+  - make
+  - sudo make install
+
+2. install clang
+   - sudo apt-get update
+   - sudo apt-get install clang 
+   check version
+   - clang++ --version
+
+3. install rapidjson
+   - git clone https://github.com/Tencent/rapidjson.git
+   - cd rapidjson
+   - cmake .
+   - make
+   - sudo make install
+
+4. install websocketpp
+   - git clone https://github.com/zaphoyd/websocketpp.git
+   - cd websocketpp
+   - cmake .
+   - make
+   - sudo make install
+
+5. install boost
+   refer to https://www.boost.org/users/history/version_1_61_0.html
+   Download boost_x_y_z.tar.gz
+   - tar -xvzf boost_x_y_z.tar.gz
+   - cd boost_x_y_z
+   - ./bootstrap.sh --prefix=/usr/local
+   - ./b2 --prefix=/usr/local
+   - sudo ./b2 install -j2 --prefix=/usr/local
+
+6. install npm (www.npmjs.com, https://github.com/nodesource/distributions)
+   - curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+   - sudo apt-get install -y nodejs
+
+7. Create React App (https://reactjs.org/docs/create-a-new-react-app.html)
+   - npx create-react-app client
+   - cd client
+   - npm install emitter
+ 
+
+
