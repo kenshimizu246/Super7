@@ -9,12 +9,6 @@
      "herts": 50
    }
   ],
-  "hc-sr04":[{
-       "pingTrig": 7,
-       "pingEcho": 100,
-       "interval": 1000
-     }
-  ],
   "motor_driver":{
     "front_right_wheel_1": 24,
     "front_right_wheel_2": 25,
@@ -34,6 +28,6 @@
     "rear_right_sensor_1": 5,
     "rear_right_sensor_2": 6,
     "rear_left_sensor_1": 1,
-    "rear_left_sensor_2": 4,
+    "rear_left_sensor_2": 4
   }
 }
