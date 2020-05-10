@@ -1,0 +1,29 @@
+
+Unit Test Policy:
+1. C1
+2. Equivalence Partitioning
+3. Boundary Analysis
+4. Use case test
+5. 
+
+Black Box Test
+- equivalence partitioning/baundary test
+  1. list up values.
+  2. categorize values and making a class
+  3. pick a value up from each classes
+  4. decide test condition
+  5. review test condition
+
+White Box Test
+- Decision Table Testing
+
+- Equivalence Partitioning & Boundary Value Analysis
+  (https://www.guru99.com/equivalence-partitioning-boundary-value-analysis.html)
+  1.
+
+References:
+https://www.guru99.com/software-testing-introduction-importance.html
+ihttps://www.guru99.com/decision-table-testing.html
+https://www.guru99.com/domain-testing.html
+https://www.guru99.com/positive-and-negative-testing.html
+ 
