@@ -7,23 +7,23 @@
 
 using namespace std;
 
-#ifndef _AppCtx_hpp
-#define _AppCtx_hpp
+#ifndef _app_ctx_hpp
+#define _app_ctx_hpp
 
 namespace raspserver {
 
-class AppCtx {
+class app_ctx {
 	private:
-		AppCtx(){}
-		~AppCtx(){}
+		app_ctx(){}
+		~app_ctx(){}
 
 	public:
-		static AppCtx& getInstance() {
-			static AppCtx instance;
+		static app_ctx& get_instance() {
+			static app_ctx instance;
 			return instance;
 		}
 };
 
 }
 
-#endif /*_AppCtx_hpp*/
+#endif /*_app_ctx_hpp*/

@@ -47,13 +47,13 @@ using websocketpp::lib::lock_guard;
 using websocketpp::lib::unique_lock;
 using websocketpp::lib::condition_variable;
 
-#include "Config.hpp"
+#include "config.hpp"
 #include "worker/vl53l0x_worker.hpp"
 #include "worker/hcsr04_worker.hpp"
 #include "worker/gy271_worker.hpp"
 #include "message.hpp"
 #include "pca9685.hpp"
-#include "mecanum_wheels_driver.hpp"
+#include "mecanum_driver.hpp"
 #include "command.hpp"
 
 #include <wiringPi.h>
@@ -121,7 +121,24 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     //hcsr04_worker hcsr04{28, 29};
     //gy271_worker gy271;
     pca9685 servo;
-    mecanum_wheels_driver motorctrl{24,25,23,22,28,29,27,26};
+    mecanum_driver motorctrl{
+      config::get_instance().get_front_right_wheel_1(),
+      config::get_instance().get_front_right_wheel_2(),
+      config::get_instance().get_front_left_wheel_1(),
+      config::get_instance().get_front_left_wheel_2(),
+      config::get_instance().get_rear_right_wheel_1(),
+      config::get_instance().get_rear_right_wheel_2(),
+      config::get_instance().get_rear_left_wheel_1(),
+      config::get_instance().get_rear_left_wheel_2(),
+      config::get_instance().get_front_right_sensor_1(),
+      config::get_instance().get_front_right_sensor_2(),
+      config::get_instance().get_front_left_sensor_1(),
+      config::get_instance().get_front_left_sensor_2(),
+      config::get_instance().get_rear_right_sensor_1(),
+      config::get_instance().get_rear_right_sensor_2(),
+      config::get_instance().get_rear_left_sensor_1(),
+      config::get_instance().get_rear_left_sensor_2()
+    };
     command_factory cmd_factory{servo, motorctrl};
 };
 
@@ -133,7 +150,7 @@ Alexo::Alexo() {
 
   wiringPiSetup(); // use wiringPi
 
-  motorctrl.initMode();
+  motorctrl.init_mode();
   servo.PwmSetup(0x40, 50);
 
   // Initialize Asio Transport
@@ -313,20 +330,20 @@ void Alexo::init(){
   
 //  wiringPiSetupGpio();
 
-//  size = Config::getInstance().getI2CSize();
+//  size = config::get_instance().getI2CSize();
 //  for(int i = 0; i < size; i++){
-//    shared_ptr<I2CConf> p = Config::getInstance().getI2CConf(i);
+//    shared_ptr<I2CConf> p = config::get_instance().getI2CConf(i);
 //    shared_ptr<PCA9685> pca = shared_ptr<PCA9685>(new PCA9685());
 //    pca->Setup(p->address, p->hertz);
 //    pca->PWMReset();
-//    tamageta::AppCtx::getInstance().add(pca);
+//    tamageta::app_ctx::get_instance().add(pca);
 //  }
 //
-//  size = Config::getInstance().getHcSr04ConfSize();
+//  size = config::get_instance().getHcSr04ConfSize();
 //  for(int i = 0; i < size; i++){
-//    shared_ptr<HcSr04Conf> p = Config::getInstance().getHcSr04Conf(i);
+//    shared_ptr<HcSr04Conf> p = config::get_instance().getHcSr04Conf(i);
 //    shared_ptr<HcSr04> hcsr04 = shared_ptr<HcSr04>(new HcSr04(p->pinTrig, p->pinEcho));
-//    tamageta::AppCtx::getInstance().add(hcsr04);
+//    tamageta::app_ctx::get_instance().add(hcsr04);
 //  }
 }
 
@@ -338,9 +355,9 @@ void Alexo::run(){
   cout << "Alexo::run() ... start\n" << endl;
 
   /* Deamonize */
-  if(Config::getInstance().isDaemon()){
-    cout << "daemonize... " << Config::getInstance().getAppDir() << " : " << Config::getInstance().getPidFile() << endl;
-    daemonize(Config::getInstance().getAppDir().c_str(), Config::getInstance().getPidFile().c_str());
+  if(config::get_instance().is_daemon()){
+    cout << "daemonize... " << config::get_instance().get_app_dir() << " : " << config::get_instance().get_pid_file() << endl;
+    daemonize(config::get_instance().get_app_dir().c_str(), config::get_instance().get_pid_file().c_str());
     signal(SIGINT, sigIntHndlr);
     cout << "daemonized!" << endl;
   } else {
@@ -353,7 +370,7 @@ void Alexo::run(){
 //  signal(SIGINT, sigIntHndlr);
 
   // listen on specified port
-  m_server.listen(Config::getInstance().getPort());
+  m_server.listen(config::get_instance().get_port());
 
   cout << "Alexo::run() ... before accept\n" << endl;
   // Start the server accept loop
@@ -452,11 +469,11 @@ int main(int argc, char **argv)
     cerr << "argument count mismatch error." << endl;
     exit(EXIT_FAILURE);
   }
-  tamageta::Config::getInstance().load(argv[1]);
+  tamageta::config::get_instance().load(argv[1]);
 
-  cout << "AppDir:" << tamageta::Config::getInstance().getAppDir() << endl;
-  cout << "LogDir:" << tamageta::Config::getInstance().getLogDir() << endl;
-  cout << "PidFile:" << tamageta::Config::getInstance().getPidFile() << endl;
+  cout << "AppDir:" << tamageta::config::get_instance().get_app_dir() << endl;
+  cout << "LogDir:" << tamageta::config::get_instance().get_log_dir() << endl;
+  cout << "PidFile:" << tamageta::config::get_instance().get_pid_file() << endl;
 
   tamageta::Alexo server;
 

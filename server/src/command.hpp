@@ -5,7 +5,8 @@
 #include <algorithm>
 
 #include "pca9685.hpp"
-#include "mecanum_wheels_driver.hpp"
+#include "motor_driver.hpp"
+#include "mecanum_driver.hpp"
 
 #ifndef _command_hpp
 #define _command_hpp
@@ -82,8 +83,8 @@ public:
   const std::string kSLIDE_RIGHT = "SLIDE_RIGHT";
   const std::string kSLIDE_LEFT = "SLIDE_LEFT";
 
-  drive_command(mecanum_wheels_driver& m, drive_command_type s): motor(m), type(s) {}
-  drive_command(mecanum_wheels_driver& m, std::string& str): motor(m) {
+  drive_command(mecanum_driver& m, drive_command_type s): motor(m), type(s) {}
+  drive_command(mecanum_driver& m, std::string& str): motor(m) {
     if (str == kFORWARD) {
       type = drive_command_type::FORWARD;
     } else if (str == kBACKWARD) {
@@ -127,10 +128,10 @@ public:
       motor.backward();
     }else if (getType() == drive_command_type::RIGHT){
       std::cout << "right selected!" << std::endl;
-      motor.right();
+      motor.round_right();
     }else if (getType() == drive_command_type::LEFT){
       std::cout << "left selected!" << std::endl;
-      motor.left();
+      motor.round_left();
     }else if (getType() == drive_command_type::STOP){
       std::cout << "stop selected!" << std::endl;
       motor.stop();
@@ -158,7 +159,7 @@ public:
   }
 
 private:
-  mecanum_wheels_driver& motor;
+  mecanum_driver& motor;
   drive_command_type type;
 };
 
@@ -194,11 +195,11 @@ private:
 
 class command_factory {
 public:
-  command_factory(pca9685& s, mecanum_wheels_driver& m): servo(s), motor(m) {}
+  command_factory(pca9685& s, mecanum_driver& m): servo(s), motor(m) {}
   void set(pca9685& s){
     servo = s;
   }
-  void set(mecanum_wheels_driver& m){
+  void set(mecanum_driver& m){
     motor = m;
   }
   std::shared_ptr<command> createDriveCommand(std::string& s){
@@ -212,7 +213,7 @@ public:
   }
 private:
   pca9685& servo;
-  mecanum_wheels_driver& motor;
+  mecanum_driver& motor;
 };
 
 #endif

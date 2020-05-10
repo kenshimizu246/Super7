@@ -5,14 +5,35 @@
   "port": 9009,
   "daemon": false,
   "i2c":[{
-      "address": "0x40",
-      "herts": 50
-    }
-   ],
-   "hc-sr04":[{
-       "pingTrig": 4,
-       "pingEcho": 5,
+     "address": "0x40",
+     "herts": 50
+   }
+  ],
+  "hc-sr04":[{
+       "pingTrig": 7,
+       "pingEcho": 100,
        "interval": 1000
      }
-   ]
+  ],
+  "motor_driver":{
+    "front_right_wheel_1": 24,
+    "front_right_wheel_2": 25,
+    "front_left_wheel_1": 23,
+    "front_left_wheel_2": 22,
+
+    "rear_right_wheel_1": 28,
+    "rear_right_wheel_2": 29,
+    "rear_left_wheel_1": 27,
+    "rear_left_wheel_2": 26,
+
+    "front_right_sensor_1": 21,
+    "front_right_sensor_2": 3,
+    "front_left_sensor_1": 2,
+    "front_left_sensor_2": 0,
+
+    "rear_right_sensor_1": 5,
+    "rear_right_sensor_2": 6,
+    "rear_left_sensor_1": 1,
+    "rear_left_sensor_2": 4,
+  }
 }
