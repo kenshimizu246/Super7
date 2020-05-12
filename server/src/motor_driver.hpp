@@ -30,6 +30,9 @@ public:
            value_2(value_2),
            cnt(cnt) {}
 
+  uint16_t get_id(){
+    return get_sensor_1() * 100 + get_sensor_2();
+  }
   uint16_t get_sensor_1(){
     return sensor_1;
   }

@@ -15,6 +15,7 @@ void motor_driver::init_mode(){
 void motor_driver::stop(){
   digitalWrite(motor_1, LOW);
   digitalWrite(motor_2, LOW);
+  cnt = 0;
   std::cout << "motor_driver::stop()! " << motor_1 << ":" << motor_2 << std::endl;
 }
 

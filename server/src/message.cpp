@@ -47,6 +47,59 @@ void message_handler::toString(std::time_t t, char* b){
     "message-type":"event",
     "message-version":1,
     "session-id":"abc123",
+    "source": "motor_driver"
+    "source-id": "0"
+  },
+  "body":{
+    "sensor_1": 23,
+    "sensor_2": 24,
+    "value_1": 1,
+    "value_2": 0,
+    "cnt": 100,
+  }
+}
+*************************************/
+void message_handler::toJSON(motor_event& event, std::string& s){
+  Document d;
+  // define the document as an object rather than an array
+  d.SetObject();
+
+  // create an allocator
+  Document::AllocatorType& allocator = d.GetAllocator();
+
+  Value header(kObjectType);
+  header.AddMember("message-type", "event", allocator);
+  header.AddMember("source", "motor_driver", allocator);
+  header.AddMember("source-id", event.get_id(), allocator);
+  d.AddMember("header", header, allocator);
+
+  //char buff[100];
+  //int len = strftime(buff, sizeof(buff), "%D %T", event.getGMTime());
+
+  Value body(kObjectType);
+  body.AddMember("sensor_1", Value().SetInt64(event.get_sensor_1()), allocator);
+  body.AddMember("sensor_2", Value().SetInt64(event.get_sensor_2()), allocator);
+  body.AddMember("value_1", Value().SetInt64(event.get_value_1()), allocator);
+  body.AddMember("value_2", Value().SetInt64(event.get_value_2()), allocator);
+  body.AddMember("count", Value().SetInt64(event.get_count()), allocator);
+  //body.AddMember("timestamp", Value().SetString(buff, len, allocator), allocator);
+  d.AddMember("body", body, allocator);
+
+  StringBuffer sb;
+  Writer<StringBuffer> writer(sb);
+  d.Accept(writer);
+
+  s.append(sb.GetString(), sb.GetLength());
+  // std::cout << sb.GetString() << std::endl;
+  //  const Ch* GetString() const {
+  // actually char*
+}
+
+/*************************************
+{ "header":{
+    "message-type":"event",
+    "message-version":1,
+    "session-id":"abc123",
     "source": "vl53l0x"
     "source-id": "0"
   },

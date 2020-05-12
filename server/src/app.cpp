@@ -81,7 +81,7 @@ struct action {
     server::message_ptr msg;
 };
 
-class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_observer, public command_observer {
+class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_observer, public command_observer, public motor_observer {
   public:
     Alexo();
     void init();
@@ -92,6 +92,7 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     void update(hcsr04_event& event);
     void update(gy271_event& event);
     void update(command_event& event);
+    void update(motor_event& event);
 
   private:
     static void signal_handler(int sig);
@@ -164,6 +165,31 @@ Alexo::Alexo() {
 
 void Alexo::daemonShutdown(){
 //  (pidFilehandle);
+}
+
+void Alexo::update(motor_event& event){
+  websocketpp::lib::error_code ec;
+
+  std::cout << "motor event: "
+         << event.get_count()
+         << ":" << event.get_sensor_1()
+         << ":" << event.get_sensor_2()
+         << ":" << event.get_value_1()
+         << ":" << event.get_value_2()
+         << ": counter :" << event.get_count()
+         << std::endl;
+  lock_guard<mutex> guard(m_connection_lock);
+
+  std::string msg;
+  message_handler::toJSON(event, msg);
+
+  std::cout << "motor event message: " << msg << endl;
+
+  con_list::iterator it;
+  for (it = m_connections.begin(); it != m_connections.end(); ++it) {
+    m_server.send(*it,msg,websocketpp::frame::opcode::text, ec);
+    std::cout << "motor event message sent: " << msg << endl;
+  }
 }
 
 void Alexo::update(vl53l0x_event& event){
@@ -380,10 +406,12 @@ void Alexo::run(){
   //vl53l0x.add((*this));
   //hcsr04.add((*this));
   //gy271.add((*this));
+  motorctrl.add((*this));
 
   //vl53l0x.start();
   //hcsr04.start();
   //gy271.start();
+  motorctrl.start_monitor();
 
   // Start the ASIO io_service run loop
   cout << "Alexo::run() ... Start the ASIO io_service run loop\n" << endl;
