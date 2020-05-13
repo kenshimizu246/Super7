@@ -4,7 +4,7 @@
 #ifndef _mecanum_driver_hpp
 #define _mecanum_driver_hpp
 
-class mecanum_driver {
+class mecanum_driver : public motor_observer {
 public:
   mecanum_driver(
          uint16_t front_right_motor_1,
@@ -40,6 +40,20 @@ public:
                       rear_left_sensor_1,
                       rear_left_sensor_2)
   {
+    fr_motor.add((*this));
+    fl_motor.add((*this));
+    rr_motor.add((*this));
+    rl_motor.add((*this));
+  }
+
+  void update(motor_event& event){
+    std::cout << "mecanum_driver:update:"
+      << "[id:" << event.get_id() << "]"
+      << "[count:" << event.get_count() << "]"
+      << std::endl;
+    if(stop_cnt <= event.get_count()){
+      stop();
+    }
   }
 
   void init_mode(){
@@ -71,6 +85,7 @@ public:
   }
 
   void forward(uint64_t count){
+    stop_cnt = count;
     fr_motor.forward(count);
     fl_motor.forward(count);
     rr_motor.forward(count);
@@ -85,6 +100,7 @@ public:
   }
 
   void forward_right(uint64_t count){
+    stop_cnt = count;
     fr_motor.stop();
     fl_motor.forward(count);
     rr_motor.forward(count);
@@ -99,6 +115,7 @@ public:
   }
 
   void forward_left(uint64_t count){
+    stop_cnt = count;
     fr_motor.forward(count);
     fl_motor.stop();
     rr_motor.stop();
@@ -113,6 +130,7 @@ public:
   }
 
   void backward(uint64_t count){
+    stop_cnt = count;
     fr_motor.backward(count);
     fl_motor.backward(count);
     rr_motor.backward(count);
@@ -127,6 +145,7 @@ public:
   }
 
   void backward_right(uint64_t count){
+    stop_cnt = count;
     fr_motor.backward(count);
     fl_motor.stop();
     rr_motor.stop();
@@ -141,6 +160,7 @@ public:
   }
 
   void backward_left(uint64_t count){
+    stop_cnt = count;
     fr_motor.stop();
     fl_motor.backward(count);
     rr_motor.backward(count);
@@ -155,6 +175,7 @@ public:
   }
 
   void round_right(uint64_t count){
+    stop_cnt = count;
     fr_motor.backward(count);
     fl_motor.forward(count);
     rr_motor.backward(count);
@@ -169,6 +190,7 @@ public:
   }
 
   void round_left(uint64_t count){
+    stop_cnt = count;
     fr_motor.forward(count);
     fl_motor.backward(count);
     rr_motor.forward(count);
@@ -183,6 +205,7 @@ public:
   }
 
   void slide_right(uint64_t count){
+    stop_cnt = count;
     fr_motor.backward(count);
     fl_motor.forward(count);
     rr_motor.forward(count);
@@ -197,6 +220,7 @@ public:
   }
 
   void slide_left(uint64_t count){
+    stop_cnt = count;
     fr_motor.forward(count);
     fl_motor.backward(count);
     rr_motor.backward(count);
@@ -222,6 +246,7 @@ private:
   motor_driver fl_motor;
   motor_driver rr_motor;
   motor_driver rl_motor;
+  uint64_t stop_cnt;
 };
 
 #endif
