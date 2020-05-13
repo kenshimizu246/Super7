@@ -117,7 +117,9 @@ public:
 
   void stop();
   void forward();
+  void forward(uint64_t count);
   void backward();
+  void backward(uint64_t count);
 
   void add(motor_observer& o);
   void remove(motor_observer& o);
@@ -138,6 +140,7 @@ private:
   pthread_mutex_t mutex;
   volatile uint64_t cnt = 0;
   volatile bool stop_monitor = false;
+  uint64_t stop_cnt = 0;
 };
 
 #endif

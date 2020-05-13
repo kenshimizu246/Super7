@@ -27,15 +27,15 @@ public:
                       front_right_motor_2,
                       front_right_sensor_1,
                       front_right_sensor_2),
-      fl_motor(0, front_left_motor_1,
+      fl_motor(1, front_left_motor_1,
                       front_left_motor_2,
                       front_left_sensor_1,
                       front_left_sensor_2),
-      rr_motor(0, rear_right_motor_1,
+      rr_motor(2, rear_right_motor_1,
                       rear_right_motor_2,
                       rear_right_sensor_1,
                       rear_right_sensor_2),
-      rl_motor(0, rear_left_motor_1,
+      rl_motor(3, rear_left_motor_1,
                       rear_left_motor_2,
                       rear_left_sensor_1,
                       rear_left_sensor_2)
@@ -70,10 +70,24 @@ public:
     rl_motor.forward();
   }
 
+  void forward(uint64_t count){
+    fr_motor.forward(count);
+    fl_motor.forward(count);
+    rr_motor.forward(count);
+    rl_motor.forward(count);
+  }
+
   void forward_right(){
     fr_motor.stop();
     fl_motor.forward();
     rr_motor.forward();
+    rl_motor.stop();
+  }
+
+  void forward_right(uint64_t count){
+    fr_motor.stop();
+    fl_motor.forward(count);
+    rr_motor.forward(count);
     rl_motor.stop();
   }
 
@@ -84,11 +98,25 @@ public:
     rl_motor.forward();
   }
 
+  void forward_left(uint64_t count){
+    fr_motor.forward(count);
+    fl_motor.stop();
+    rr_motor.stop();
+    rl_motor.forward(count);
+  }
+
   void backward(){
     fr_motor.backward();
     fl_motor.backward();
     rr_motor.backward();
     rl_motor.backward();
+  }
+
+  void backward(uint64_t count){
+    fr_motor.backward(count);
+    fl_motor.backward(count);
+    rr_motor.backward(count);
+    rl_motor.backward(count);
   }
 
   void backward_right(){
@@ -98,10 +126,24 @@ public:
     rl_motor.backward();
   }
 
+  void backward_right(uint64_t count){
+    fr_motor.backward(count);
+    fl_motor.stop();
+    rr_motor.stop();
+    rl_motor.backward(count);
+  }
+
   void backward_left(){
     fr_motor.stop();
     fl_motor.backward();
     rr_motor.backward();
+    rl_motor.stop();
+  }
+
+  void backward_left(uint64_t count){
+    fr_motor.stop();
+    fl_motor.backward(count);
+    rr_motor.backward(count);
     rl_motor.stop();
   }
 
@@ -112,11 +154,25 @@ public:
     rl_motor.forward();
   }
 
+  void round_right(uint64_t count){
+    fr_motor.backward(count);
+    fl_motor.forward(count);
+    rr_motor.backward(count);
+    rl_motor.forward(count);
+  }
+
   void round_left(){
     fr_motor.forward();
     fl_motor.backward();
     rr_motor.forward();
     rl_motor.backward();
+  }
+
+  void round_left(uint64_t count){
+    fr_motor.forward(count);
+    fl_motor.backward(count);
+    rr_motor.forward(count);
+    rl_motor.backward(count);
   }
 
   void slide_right(){
@@ -126,11 +182,25 @@ public:
     rl_motor.backward();
   }
 
+  void slide_right(uint64_t count){
+    fr_motor.backward(count);
+    fl_motor.forward(count);
+    rr_motor.forward(count);
+    rl_motor.backward(count);
+  }
+
   void slide_left(){
     fr_motor.forward();
     fl_motor.backward();
     rr_motor.backward();
     rl_motor.forward();
+  }
+
+  void slide_left(uint64_t count){
+    fr_motor.forward(count);
+    fl_motor.backward(count);
+    rr_motor.backward(count);
+    rl_motor.forward(count);
   }
 
   void add(motor_observer& o){

@@ -395,7 +395,11 @@ std::shared_ptr<command> message_handler::toCommand(command_factory& factory, st
       throw message_handler_error(ss.str().c_str());
     }
     std::string command = d[kBody]["command"].GetString();
-    p = factory.createDriveCommand(command);
+    if (d[kBody].HasMember("count")){
+      p = factory.createDriveCommand(command, d[kBody]["count"].GetInt());
+    } else {
+      p = factory.createDriveCommand(command);
+    }
   } else if(target == "servo") {
     unsigned int id = d[kBody]["id"].GetInt();
     unsigned int value = d[kBody]["value"].GetInt();

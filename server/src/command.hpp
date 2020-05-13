@@ -83,8 +83,16 @@ public:
   const std::string kSLIDE_RIGHT = "SLIDE_RIGHT";
   const std::string kSLIDE_LEFT = "SLIDE_LEFT";
 
-  drive_command(mecanum_driver& m, drive_command_type s): motor(m), type(s) {}
-  drive_command(mecanum_driver& m, std::string& str): motor(m) {
+  drive_command(mecanum_driver& m, drive_command_type s): motor(m), type(s), count(0) {}
+  drive_command(mecanum_driver& m, drive_command_type s, uint64_t count): motor(m), type(s), count(count) {}
+  drive_command(mecanum_driver& m, std::string& str): motor(m), count(0) {
+    setType(str);
+  }
+  drive_command(mecanum_driver& m, std::string& str, uint64_t count): motor(m), count(count) {
+    setType(str);
+  }
+
+  void setType(std::string& str){
     if (str == kFORWARD) {
       type = drive_command_type::FORWARD;
     } else if (str == kBACKWARD) {
@@ -119,40 +127,81 @@ public:
   }
 
   drive_command_type getType(){ return type; }
+
   void doCommand(){
     if (getType() == drive_command_type::FORWARD){
       std::cout << "forward selected!" << std::endl;
-      motor.forward();
+      if(count > 0){
+        motor.forward(count);
+      } else {
+        motor.forward();
+      }
     }else if (getType() == drive_command_type::BACKWARD){
       std::cout << "backward selected!" << std::endl;
-      motor.backward();
+      if(count > 0){
+        motor.backward(count);
+      } else {
+        motor.backward();
+      }
     }else if (getType() == drive_command_type::RIGHT){
       std::cout << "right selected!" << std::endl;
-      motor.round_right();
+      if(count > 0){
+        motor.round_right(count);
+      } else {
+        motor.round_right();
+      }
     }else if (getType() == drive_command_type::LEFT){
       std::cout << "left selected!" << std::endl;
-      motor.round_left();
+      if(count > 0){
+        motor.round_left(count);
+      } else {
+        motor.round_left();
+      }
     }else if (getType() == drive_command_type::STOP){
       std::cout << "stop selected!" << std::endl;
       motor.stop();
     }else if (getType() == drive_command_type::FORWARD_RIGHT){
       std::cout << "forward right selected!" << std::endl;
-      motor.forward_right();
+      if(count > 0){
+        motor.forward_right(count);
+      } else {
+        motor.forward_right();
+      }
     }else if (getType() == drive_command_type::FORWARD_LEFT){
       std::cout << "forward left selected!" << std::endl;
-      motor.forward_left();
+      if(count > 0){
+        motor.forward_left(count);
+      } else {
+        motor.forward_left();
+      }
     }else if (getType() == drive_command_type::BACKWARD_RIGHT){
       std::cout << "backward right selected!" << std::endl;
-      motor.backward_right();
+      if(count > 0){
+        motor.backward_right(count);
+      } else {
+        motor.backward_right();
+      }
     }else if (getType() == drive_command_type::BACKWARD_LEFT){
       std::cout << "backward left selected!" << std::endl;
-      motor.backward_left();
+      if(count > 0){
+        motor.backward_left(count);
+      } else {
+        motor.backward_left();
+      }
     }else if (getType() == drive_command_type::SLIDE_RIGHT){
       std::cout << "slide right selected!" << std::endl;
-      motor.slide_right();
+      if(count > 0){
+        motor.slide_right(count);
+      } else {
+        motor.slide_right();
+      }
     }else if (getType() == drive_command_type::SLIDE_LEFT){
       std::cout << "slide left selected!" << std::endl;
-      motor.slide_left();
+      if(count > 0){
+        motor.slide_left(count);
+      } else {
+        motor.slide_left();
+      }
     }else if (getType() == drive_command_type::AUTO){
       std::cout << "else selected!" << std::endl;
     }
@@ -161,6 +210,7 @@ public:
 private:
   mecanum_driver& motor;
   drive_command_type type;
+  uint64_t count;
 };
 
 class servo_command_event : public command_event {
@@ -205,8 +255,14 @@ public:
   std::shared_ptr<command> createDriveCommand(std::string& s){
     return std::shared_ptr<command>(new drive_command(motor, s));
   }
+  std::shared_ptr<command> createDriveCommand(std::string& s, uint64_t count){
+    return std::shared_ptr<command>(new drive_command(motor, s, count));
+  }
   std::shared_ptr<command> createDriveCommand(drive_command_type s){
     return std::shared_ptr<command>(new drive_command(motor, s));
+  }
+  std::shared_ptr<command> createDriveCommand(drive_command_type s, uint64_t count){
+    return std::shared_ptr<command>(new drive_command(motor, s, count));
   }
   std::shared_ptr<command> createServoCommand(int id, unsigned int value){
     return std::shared_ptr<command>(new servo_command(servo, id, value));
