@@ -41,6 +41,9 @@ class config {
     uint16_t rear_left_sensor_1;
     uint16_t rear_left_sensor_2;
 
+    uint8_t front_vl53l0x_address = 0x29;
+    uint16_t front_vl53l0x_stop_distance = 100;
+
   public:
     void load(const char* filename);
     string get_app_dir();
@@ -50,6 +53,14 @@ class config {
     bool is_initialized();
 
     bool is_daemon();
+
+    uint8_t get_front_vl53l0x_address(){
+      return front_vl53l0x_address;
+    }
+
+    uint16_t get_front_vl53l0x_stop_distance(){
+      return front_vl53l0x_stop_distance;
+    }
 
     uint16_t get_front_right_wheel_1(){
       if(!initialized) throw runtime_error("config has not yet been initialized!");

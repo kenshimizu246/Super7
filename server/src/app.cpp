@@ -118,7 +118,7 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     mutex m_connection_lock;
     condition_variable m_action_cond;
 
-    //vl53l0x_worker vl53l0x{0};
+    vl53l0x_worker vl53l0x{0};
     //hcsr04_worker hcsr04{28, 29};
     //gy271_worker gy271;
     pca9685 servo;
@@ -194,6 +194,14 @@ void Alexo::update(motor_event& event){
 
 void Alexo::update(vl53l0x_event& event){
   websocketpp::lib::error_code ec;
+
+  if(event.getDistance() < config::get_instance().get_front_vl53l0x_stop_distance()){
+    std::cout << "vl53l0x stop trigger: "
+              << "[dist: " << event.getDistance() << "]"
+              << "[stop: " << config::get_instance().get_front_vl53l0x_stop_distance() << "]"
+              << std::endl;
+    motorctrl.stop();
+  }
 
   //std::cout << "received distance: " << event.getDistance() << std::endl;
   lock_guard<mutex> guard(m_connection_lock);
@@ -403,12 +411,12 @@ void Alexo::run(){
   m_server.start_accept();
 
   cout << "Alexo::run() ... before start vl53l0x\n" << endl;
-  //vl53l0x.add((*this));
+  vl53l0x.add((*this));
   //hcsr04.add((*this));
   //gy271.add((*this));
   motorctrl.add((*this));
 
-  //vl53l0x.start();
+  vl53l0x.start();
   //hcsr04.start();
   //gy271.start();
   motorctrl.start_monitor();
