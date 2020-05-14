@@ -51,7 +51,7 @@ public:
       << "[id:" << event.get_id() << "]"
       << "[count:" << event.get_count() << "]"
       << std::endl;
-    if(stop_cnt <= event.get_count()){
+    if(stop_cnt > 0 && stop_cnt <= event.get_count()){
       stop();
     }
   }
@@ -75,6 +75,10 @@ public:
     fl_motor.stop();
     rr_motor.stop();
     rl_motor.stop();
+    std::cout << "mecanum_driver:stop:"
+      << "[stop_cnt:" << stop_cnt << "]"
+      << std::endl;
+    stop_cnt = 0;
   }
 
   void forward(){

@@ -15,8 +15,11 @@ function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
     return value;
   }
 
+  function getValue(){
+    return value;
+  }
+
   function handlerWrapper(){
-    console.log('handlerWrapper');
     if(handlerOnClick){
       handlerOnClick(convert(value));
     }
@@ -37,17 +40,20 @@ function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
     handlerWrapper();
   }
 
-     // {value} : {eventDesc}
+  // {value} : {eventDesc}
   return (
     <div>
-      <input type="range"
-        min={minVal} max={maxVal} step={stepVal} defaultValue={initVal}
-        onClick={() => {handlerWrapper();}}
-        onChange={(e) => {handleOnChange(e);}}
-        onInput={(e) => {handleOnInput(e);}}
-        onTouchStart={(e) => {handleOnTouchStart(e);}}
-        onTouchEnd={(e) => {handleOnTouchEnd(e);}}
-      />
+      <div>
+        <input type="range"
+          min={minVal} max={maxVal} step={stepVal} defaultValue={initVal}
+          onClick={() => {handlerWrapper();}}
+          onChange={(e) => {handleOnChange(e);}}
+          onInput={(e) => {handleOnInput(e);}}
+          onTouchStart={(e) => {handleOnTouchStart(e);}}
+          onTouchEnd={(e) => {handleOnTouchEnd(e);}}
+        />
+      </div>
+      <div>{value}</div>
     </div>
   );
 }

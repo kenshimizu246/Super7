@@ -10,7 +10,7 @@ import ServoSlider from './ServoSlider';
 
 var msgcnt = 0;
 var conn = new Connection('ws://' + window.location.hostname + ':9009', ['alexo']);
-
+var stop_count = 0;
 
 function onSystemEvent(msg){
   //var s = JSON.stringify(msg);
@@ -30,6 +30,13 @@ conn.connect();
 
 
 function App() {
+
+  function handlerRangeStopCount(value){
+    stop_count = Number(value);
+  }
+
+  let rangeStopCount = Range(handlerRangeStopCount, 0, 550, 1, 0, false);
+
   function handlerDrive(cmd){
     msgcnt++;
     const message = {
@@ -39,6 +46,7 @@ function App() {
       },
       body: {
         command: cmd,
+        count: stop_count,
       },
     }
     const str = JSON.stringify(message)
@@ -84,25 +92,11 @@ function App() {
       },
       body: {
         command: cmd,
+        count: stop_count,
       },
     }
     const str = JSON.stringify(message)
     //console.log("message:"+str)
-    conn.send(str);
-  }
-
-  function handlerRangeSensor(value){
-    const message = {
-      header: {
-        target: 'servo',
-        seq: msgcnt,
-      },
-      body: {
-        id: 2,
-        value: parseInt(value, 10),
-      },
-    }
-    const str = JSON.stringify(message)
     conn.send(str);
   }
 
@@ -113,13 +107,12 @@ function App() {
   let controlb = ControlButton(handlerControlButton, true);
   let rangeCamX = Range(handlerRangeCamY, 125, 540, 1, 300, true);
   let rangeCamY = Range(handlerRangeCamX, 125, 450, 1, 300, true);
-  let rangeSens = Range(handlerRangeSensor, 100, 550, 1, 300, false);
 
-  let servoSlider = ServoSlider(handlerRangeSensor, 'srv01', conn, 100, 550, 1, 325, 320, 20);
+  let servoSlider = ServoSlider(handlerRangeStopCount, 'srv01', conn, 1, 550, 1, 325, 320, 20);
 
   let vl53l0x = Distance(conn, 'vl53l0x', 0, 'VL53L0X', 'Time of Flight distance sensor');
-  let hcsr04 = Distance(conn, 'hcsr04', 0, 'HCSR04', 'Ultrasonic Sensor');
-  let headingXYZ = Compass(conn, 'gy271', 0, 'GY271', 'Three Axis Magnetic Field Sensor');
+  let hcsr04 = Distance(conn, 'hcsr04', 0, 'HCSR04', 'Ultrasonic ');
+  let headingXYZ = Compass(conn, 'gy271', 0, 'GY271', 'Three Axis Magnetic Field ');
   let stop = DriveButton(handlerDriveButton, 'STOP', 'STOP', false);
   let autodrive = DriveButton(handlerDriveButton, 'AUTO', 'AUTO', false);
   let forward = DriveButton(handlerDriveButton, 'FORWARD', 'FORWARD', false);
@@ -149,8 +142,8 @@ function App() {
          {rangeCamX}
        </div>
      </div>
-     <div className="rangeSens">
-       {rangeSens}
+     <div className="rangeStopCount">
+       {rangeStopCount}
      </div>
      <div className='controllerRow'>
        <div>{forward_left}</div>
