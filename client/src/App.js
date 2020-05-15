@@ -93,8 +93,7 @@ function App() {
 
   let servoSlider = ServoSlider(handlerStopCounter, 'srv01', conn, 100, 550, 1, 325, 320, 20);
 
-  let vl53l0x = Distance(conn, 'vl53l0x', 0, 'VL53L0X', 'Time of Flight distance sensor');
-  let hcsr04 = Distance(conn, 'hcsr04', 0, 'HCSR04', 'Ultrasonic Sensor');
+  let vl53l0x_f = Distance(conn, 'vl53l0x', 0, 'VL53L0X', 'Time of Flight distance sensor');
   let headingXYZ = Compass(conn, 'gy271', 0, 'GY271', 'Three Axis Magnetic Field Sensor');
   let stop = DriveButton(handlerDriveButton, 'STOP', 'STOP', false);
   let autodrive = DriveButton(handlerDriveButton, 'AUTO', 'AUTO', false);
@@ -154,16 +153,10 @@ function App() {
        <div>{backward_right}</div>
      </div>
      <div>
-       {vl53l0x}
-     </div>
-     <div>
-       {hcsr04}
+       {vl53l0x_f}
      </div>
      <div>
        {headingXYZ}
-     </div>
-     <div>
-       {servoSlider}
      </div>
     </div>
   );
