@@ -10,7 +10,7 @@ import ServoSlider from './ServoSlider';
 
 var msgcnt = 0;
 var stop_count = 0;
-var conn = new Connection('ws://' + window.location.hostname + ':9009', ['alexo']);
+var conn = new Connection('ws://' + window.location.hostname + ':9009', ['super7']);
 
 
 function onSystemEvent(msg){
@@ -86,12 +86,10 @@ function App() {
     //console.log("handleControlButton:value:"+value);
   }
 
-  let controlb = ControlButton(handlerControlButton, true);
-  let rangeCamX = Range(handlerRangeCamY, 125, 540, 1, 300, true);
-  let rangeCamY = Range(handlerRangeCamX, 125, 450, 1, 300, true);
-  let rangeStopCount = Range(handlerStopCounter, 0, 500, 1, 0, false);
-
-  let servoSlider = ServoSlider(handlerStopCounter, 'srv01', conn, 100, 550, 1, 325, 320, 20);
+  let controlb = ControlButton(handlerControlButton, true, false);
+  let rangeCamX = Range(handlerRangeCamY, 125, 540, 1, 300, true, false);
+  let rangeCamY = Range(handlerRangeCamX, 125, 450, 1, 300, true, false);
+  let rangeStopCount = Range(handlerStopCounter, 0, 500, 1, 0, false, true);
 
   let vl53l0x_f = Distance(conn, 'vl53l0x', 0, 'VL53L0X', 'Time of Flight distance sensor');
   let headingXYZ = Compass(conn, 'gy271', 0, 'GY271', 'Three Axis Magnetic Field Sensor');
@@ -108,13 +106,14 @@ function App() {
   let slide_right = DriveButton(handlerDriveButton, 'SLIDE_RIGHT', 'SLIDE', false);
   let slide_left = DriveButton(handlerDriveButton, 'SLIDE_LEFT', 'SLIDE', false);
 
+  let monitor_address = "http://" + window.location.hostname + ":8081";
   return (
     <div className="App">
      <div className="title">Ashlynn</div>
      <div className="monitorControlX">
        <div className="monitorControlY">
          <div className='monitor'>
-           <img src="http://192.168.1.90:8081" alt='monitor'/>
+           <img src={monitor_address} alt='monitor'/>
          </div>
          <div className="rangeCamY">
            {rangeCamY}
@@ -125,12 +124,7 @@ function App() {
        </div>
      </div>
      <div className="rangeStopCountBox">
-       <div className="rangeStopCount">
-         {rangeStopCount}
-       </div>
-       <div className="rangeStopCountText">
-         {stop_count}
-       </div>
+       {rangeStopCount}
      </div>
      <div className='controllerRow'>
        <div>{forward_left}</div>

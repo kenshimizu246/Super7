@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 
 
-function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
+function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip, showValue){
   const [value, setValue] = useState(initVal);
   const [eventDesc, setEventDesc] = useState("");
   const range = maxVal - minVal;
@@ -36,6 +36,10 @@ function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
     setEventDesc('OnTouchEnd');
     handlerWrapper();
   }
+  var valueText = ""
+  if(showValue){
+    valueText = (<div className="rangeValueText">{value}</div>);
+  }
 
      // {value} : {eventDesc}
   return (
@@ -48,6 +52,7 @@ function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
         onTouchStart={(e) => {handleOnTouchStart(e);}}
         onTouchEnd={(e) => {handleOnTouchEnd(e);}}
       />
+      {valueText}
     </div>
   );
 }
