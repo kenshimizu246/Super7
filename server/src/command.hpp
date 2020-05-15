@@ -129,8 +129,12 @@ public:
   drive_command_type getType(){ return type; }
 
   void doCommand(){
+    std::cout << "doCommand "
+              << "[type:" << getType() << "]"
+              << "[count:" << count << "]"
+              << std::endl;
     if (getType() == drive_command_type::FORWARD){
-      std::cout << "forward selected!" << std::endl;
+      std::cout << "forward selected! " << "[count:" << count << "]" << std::endl;
       if(count > 0){
         motor.forward(count);
       } else {

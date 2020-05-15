@@ -9,6 +9,7 @@ import Connection from './Connection';
 import ServoSlider from './ServoSlider';
 
 var msgcnt = 0;
+var stop_count = 0;
 var conn = new Connection('ws://' + window.location.hostname + ':9009', ['alexo']);
 
 
@@ -30,21 +31,6 @@ conn.connect();
 
 
 function App() {
-  function handlerDrive(cmd){
-    msgcnt++;
-    const message = {
-      header: {
-        target: 'drive',
-        seq: msgcnt,
-      },
-      body: {
-        command: cmd,
-      },
-    }
-    const str = JSON.stringify(message)
-    conn.send(str);
-  }
-
   function handlerRangeCamY(value){
     msgcnt++;
     const message = {
@@ -84,6 +70,7 @@ function App() {
       },
       body: {
         command: cmd,
+        count: stop_count,
       },
     }
     const str = JSON.stringify(message)
@@ -91,19 +78,8 @@ function App() {
     conn.send(str);
   }
 
-  function handlerRangeSensor(value){
-    const message = {
-      header: {
-        target: 'servo',
-        seq: msgcnt,
-      },
-      body: {
-        id: 2,
-        value: parseInt(value, 10),
-      },
-    }
-    const str = JSON.stringify(message)
-    conn.send(str);
+  function handlerStopCounter(value){
+    stop_count = Number(value);
   }
 
   function handlerControlButton(value){
@@ -113,9 +89,9 @@ function App() {
   let controlb = ControlButton(handlerControlButton, true);
   let rangeCamX = Range(handlerRangeCamY, 125, 540, 1, 300, true);
   let rangeCamY = Range(handlerRangeCamX, 125, 450, 1, 300, true);
-  let rangeSens = Range(handlerRangeSensor, 100, 550, 1, 300, false);
+  let rangeStopCount = Range(handlerStopCounter, 0, 500, 1, 0, false);
 
-  let servoSlider = ServoSlider(handlerRangeSensor, 'srv01', conn, 100, 550, 1, 325, 320, 20);
+  let servoSlider = ServoSlider(handlerStopCounter, 'srv01', conn, 100, 550, 1, 325, 320, 20);
 
   let vl53l0x = Distance(conn, 'vl53l0x', 0, 'VL53L0X', 'Time of Flight distance sensor');
   let hcsr04 = Distance(conn, 'hcsr04', 0, 'HCSR04', 'Ultrasonic Sensor');
@@ -149,8 +125,13 @@ function App() {
          {rangeCamX}
        </div>
      </div>
-     <div className="rangeSens">
-       {rangeSens}
+     <div className="rangeStopCountBox">
+       <div className="rangeStopCount">
+         {rangeStopCount}
+       </div>
+       <div className="rangeStopCountText">
+         {stop_count}
+       </div>
      </div>
      <div className='controllerRow'>
        <div>{forward_left}</div>

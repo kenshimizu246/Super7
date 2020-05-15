@@ -152,9 +152,30 @@ input {
   height: 21px;
 }
 
-.rangeSens input {
+.rangeStopCountBox {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
   width: 320px;
   height: 21px;
+
+}
+
+.rangeStopCount input {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  height: 21px;
+}
+
+.rangeStopCountText {
+  position: absolute;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .sliderBox {
