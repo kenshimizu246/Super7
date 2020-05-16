@@ -136,4 +136,17 @@ void motor_driver::start_monitor(){
     << std::endl;
 }
 
+motor_driver::STATE motor_driver::get_state(){
+  uint16_t v1 = digitalRead(motor_1);
+  uint16_t v2 = digitalRead(motor_2);
+
+  if(v1 == HIGH && v2 == LOW) {
+    return FORWARD;
+  } else if(v1 == LOW && v2 == HIGH) {
+    return BACKWARD;
+  } else if(v1 == LOW && v2 == LOW) {
+    return STOP;
+  }
+  return UNKNOWN;
+}
 

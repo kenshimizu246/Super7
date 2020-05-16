@@ -189,7 +189,8 @@ void Alexo::update(motor_event& event){
 void Alexo::update(vl53l0x_event& event){
   websocketpp::lib::error_code ec;
 
-  if(event.getDistance() < config::get_instance().get_front_vl53l0x_stop_distance()){
+  if(motorctrl.get_state() == mecanum_driver::STATE::FORWARD
+      && event.getDistance() < config::get_instance().get_front_vl53l0x_stop_distance()){
     std::cout << "vl53l0x stop trigger: "
               << "[dist: " << event.getDistance() << "]"
               << "[stop: " << config::get_instance().get_front_vl53l0x_stop_distance() << "]"

@@ -56,33 +56,6 @@ private:
   uint64_t cnt;
 };
 
-/*
-class motor_sensor_worker {
-public:
-  motor_sensor_worker(
-         uint16_t sensor_1,
-         uint16_t sensor_2
-         ):
-         sensor_1(sensor_1),
-         sensor_2(sensor_2) {
-  }
-  ~motor_sensor_worker(){
-  }
-
-  void start();
-  static void* execute_launcher(void* args);
-
-private:
-  uint16_t sensor_1;
-  uint16_t sensor_2;
-  volatile bool stop = false;
-  std::vector<motor_sensor_observer*> observers;
-
-  pthread_t thread_handler;
-  pthread_mutex_t mutex;
-};
-*/
-
 class motor_observer {
 public:
   virtual ~motor_observer() = default;
@@ -113,6 +86,13 @@ public:
     observers.clear();
   }
 
+  enum STATE {
+    FORWARD,
+    BACKWARD,
+    STOP,
+    UNKNOWN
+  };
+
   void init_mode();
 
   void stop();
@@ -120,6 +100,7 @@ public:
   void forward(uint64_t count);
   void backward();
   void backward(uint64_t count);
+  STATE get_state();
 
   void add(motor_observer& o);
   void remove(motor_observer& o);

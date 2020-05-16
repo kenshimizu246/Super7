@@ -56,6 +56,84 @@ public:
     }
   }
 
+  enum STATE {
+    FORWARD,
+    FORWARD_RIGHT,
+    FORWARD_LEFT,
+    BACKWARD,
+    BACKWARD_RIGHT,
+    BACKWARD_LEFT,
+    ROUND_RIGHT,
+    ROUND_LEFT,
+    SLIDE_RIGHT,
+    SLIDE_LEFT,
+    STOP,
+    UNKNOWN
+  };
+
+  STATE get_state(){
+    motor_driver::STATE fr, fl, rr, rl;
+
+    fr = fr_motor.get_state();
+    fl = fl_motor.get_state();
+    rr = rr_motor.get_state();
+    rl = rl_motor.get_state();
+
+    if(fr == motor_driver::STATE::FORWARD
+       && fl == motor_driver::STATE::FORWARD
+       && rr == motor_driver::STATE::FORWARD
+       && rl == motor_driver::STATE::FORWARD){
+      return FORWARD;
+    } else if(fr == motor_driver::STATE::STOP
+           && fl == motor_driver::STATE::FORWARD
+           && rr == motor_driver::STATE::FORWARD
+           && rl == motor_driver::STATE::STOP){
+      return FORWARD_RIGHT;
+    } else if(fr == motor_driver::STATE::FORWARD
+           && fl == motor_driver::STATE::STOP
+           && rr == motor_driver::STATE::STOP
+           && rl == motor_driver::STATE::FORWARD){
+      return FORWARD_LEFT;
+    } else if(fr == motor_driver::STATE::BACKWARD
+           && fl == motor_driver::STATE::BACKWARD
+           && rr == motor_driver::STATE::BACKWARD
+           && rl == motor_driver::STATE::BACKWARD){
+      return BACKWARD;
+    } else if(fr == motor_driver::STATE::BACKWARD
+           && fl == motor_driver::STATE::STOP
+           && rr == motor_driver::STATE::STOP
+           && rl == motor_driver::STATE::BACKWARD){
+      return BACKWARD_RIGHT;
+    } else if(fr == motor_driver::STATE::STOP
+           && fl == motor_driver::STATE::BACKWARD
+           && rr == motor_driver::STATE::BACKWARD
+           && rl == motor_driver::STATE::STOP){
+      return BACKWARD_LEFT;
+    } else if(fr == motor_driver::STATE::BACKWARD
+           && fl == motor_driver::STATE::FORWARD
+           && rr == motor_driver::STATE::BACKWARD
+           && rl == motor_driver::STATE::FORWARD){
+      return ROUND_RIGHT;
+    } else if(fr == motor_driver::STATE::FORWARD
+           && fl == motor_driver::STATE::BACKWARD
+           && rr == motor_driver::STATE::FORWARD
+           && rl == motor_driver::STATE::BACKWARD){
+      return ROUND_RIGHT;
+    } else if(fr == motor_driver::STATE::BACKWARD
+           && fl == motor_driver::STATE::FORWARD
+           && rr == motor_driver::STATE::FORWARD
+           && rl == motor_driver::STATE::BACKWARD){
+      return SLIDE_RIGHT;
+    } else if(fr == motor_driver::STATE::FORWARD
+           && fl == motor_driver::STATE::BACKWARD
+           && rr == motor_driver::STATE::BACKWARD
+           && rl == motor_driver::STATE::FORWARD){
+      return SLIDE_LEFT;
+    }
+
+    return UNKNOWN;
+  }
+
   void init_mode(){
     fr_motor.init_mode();
     fl_motor.init_mode();
