@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 
 
-function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
+function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip, showValue){
   const [value, setValue] = useState(initVal);
   const [eventDesc, setEventDesc] = useState("");
   const range = maxVal - minVal;
@@ -39,21 +39,23 @@ function Range(handlerOnClick, minVal, maxVal, stepVal, initVal, flip){
     setEventDesc('OnTouchEnd');
     handlerWrapper();
   }
+  var valueText = ""
+  if(showValue){
+    valueText = (<div className="rangeValueText">{value}</div>);
+  }
 
   // {value} : {eventDesc}
   return (
     <div>
-      <div>
-        <input type="range"
-          min={minVal} max={maxVal} step={stepVal} defaultValue={initVal}
-          onClick={() => {handlerWrapper();}}
-          onChange={(e) => {handleOnChange(e);}}
-          onInput={(e) => {handleOnInput(e);}}
-          onTouchStart={(e) => {handleOnTouchStart(e);}}
-          onTouchEnd={(e) => {handleOnTouchEnd(e);}}
-        />
-      </div>
-      <div>{value}</div>
+      <input type="range"
+        min={minVal} max={maxVal} step={stepVal} defaultValue={initVal}
+        onClick={() => {handlerWrapper();}}
+        onChange={(e) => {handleOnChange(e);}}
+        onInput={(e) => {handleOnInput(e);}}
+        onTouchStart={(e) => {handleOnTouchStart(e);}}
+        onTouchEnd={(e) => {handleOnTouchEnd(e);}}
+      />
+      {valueText}
     </div>
   );
 }

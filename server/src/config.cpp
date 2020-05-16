@@ -42,6 +42,10 @@ void config::load(const char* filename){
 
   const char *cDaemon = "daemon";
 
+  const char *cfront_vl53l0x = "front_vl53l0x";
+  const char *cfront_vl53l0x_address = "address";
+  const char *cfront_vl53l0x_stop_distance = "stop_distance";
+
   const char *cmotor_driver = "motor_driver";
 
   const char *cfront_right_wheel_1 = "front_right_wheel_1";
@@ -126,6 +130,31 @@ void config::load(const char* filename){
   if (!doc.HasMember(cDaemon)) {
     throw runtime_error("daemon is not configured!");
   }
+
+  // front vl53l0x i2c
+  if (!doc.HasMember(cfront_vl53l0x)) {
+    throw runtime_error("front_vl53l0x is not configured!");
+  }
+  const Value& front_vl53l0x = doc[cfront_vl53l0x];
+
+  // front vl53l0x address
+  //if (!front_vl53l0x.HasMember(cfront_vl53l0x_address)) {
+  //  throw runtime_error("front_vl53l0x.address is not configured!");
+  //}
+  //if (!front_vl53l0x[cfront_vl53l0x_address].IsInt()) {
+  //  throw runtime_error("front_vl53l0x_address must be number (0x...)!");
+  //}
+  //front_vl53l0x_address = front_vl53l0x[cfront_vl53l0x_address].GetInt();
+
+  // front vl53l0x stop distance
+  if (!front_vl53l0x.HasMember(cfront_vl53l0x_stop_distance)) {
+    throw runtime_error("front_vl53l0x_address_stop_distance is not configured!");
+  }
+  if (!front_vl53l0x[cfront_vl53l0x_stop_distance].IsInt()) {
+    throw runtime_error("front_vl53l0x_stop_distance must be integer!");
+  }
+  front_vl53l0x_stop_distance = front_vl53l0x[cfront_vl53l0x_stop_distance].GetInt();
+
 
   // motor driver
   if (!doc.HasMember(cmotor_driver)) {

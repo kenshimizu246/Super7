@@ -17,7 +17,6 @@
 
 
 #include "worker/vl53l0x_worker.hpp"
-#include "worker/hcsr04_worker.hpp"
 #include "worker/gy271_worker.hpp"
 #include "message.hpp"
 #include "command.hpp"
@@ -129,55 +128,6 @@ void message_handler::toJSON(vl53l0x_event& event, std::string& s){
 
   Value body(kObjectType);
   body.AddMember("distance", Value().SetFloat(event.getDistance()), allocator);
-  body.AddMember("status", event.getStatus(), allocator);
-  body.AddMember("timestamp", Value().SetString(buff, len, allocator), allocator);
-  d.AddMember("body", body, allocator);
-
-  StringBuffer sb;
-  Writer<StringBuffer> writer(sb);
-  d.Accept(writer);
-
-  s.append(sb.GetString(), sb.GetLength());
-  // std::cout << sb.GetString() << std::endl;
-  //  const Ch* GetString() const {
-  // actually char*
-}
-
-/*************************************
-{ "header":{
-    "message-type":"event",
-    "message-version":1,
-    "session-id":"abc123",
-    "source": "hcsr04"
-    "source-id": "0"
-  },
-  "body":{
-    "distance": 123,
-    "status": "SUCCESS",
-    "timestamp": "",
-  }
-}
-*************************************/
-void message_handler::toJSON(hcsr04_event& event, std::string& s){
-  Document d;
-  // define the document as an object rather than an array
-  d.SetObject();
-
-  // create an allocator
-  Document::AllocatorType& allocator = d.GetAllocator();
-
-  Value header(kObjectType);
-  header.AddMember("message-type", "event", allocator);
-  header.AddMember("source", "hcsr04", allocator);
-  header.AddMember("source-id", 0, allocator);
-  d.AddMember("header", header, allocator);
-
-  char buff[100];
-  int len = strftime(buff, sizeof(buff), "%D %T", event.getGMTime());
-
-  Value body(kObjectType);
-  //body.AddMember("distance", event.getDistance(), allocator);
-  body.AddMember("distance", Value().SetInt64(event.getDistance()), allocator);
   body.AddMember("status", event.getStatus(), allocator);
   body.AddMember("timestamp", Value().SetString(buff, len, allocator), allocator);
   d.AddMember("body", body, allocator);

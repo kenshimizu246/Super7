@@ -9,6 +9,10 @@
      "herts": 50
    }
   ],
+  "front_vl53l0x":{
+    "address": "0x29",
+    "stop_distance": 100
+  },
   "motor_driver":{
     "front_right_wheel_1": 24,
     "front_right_wheel_2": 25,

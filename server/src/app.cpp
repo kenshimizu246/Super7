@@ -29,9 +29,6 @@
 #include <iostream>
 #include <set>
 
-/*#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>*/
 #include <websocketpp/common/thread.hpp>
 
 typedef websocketpp::server<websocketpp::config::asio> server;
@@ -49,7 +46,6 @@ using websocketpp::lib::condition_variable;
 
 #include "config.hpp"
 #include "worker/vl53l0x_worker.hpp"
-#include "worker/hcsr04_worker.hpp"
 #include "worker/gy271_worker.hpp"
 #include "message.hpp"
 #include "pca9685.hpp"
@@ -66,22 +62,22 @@ using namespace rapidjson;
 namespace tamageta {
 
 enum action_type {
-    SUBSCRIBE,
-    UNSUBSCRIBE,
-    MESSAGE
+  SUBSCRIBE,
+  UNSUBSCRIBE,
+  MESSAGE
 };
 
 struct action {
-    action(action_type t, connection_hdl h) : type(t), hdl(h) {}
-    action(action_type t, connection_hdl h, server::message_ptr m)
-      : type(t), hdl(h), msg(m) {}
+  action(action_type t, connection_hdl h) : type(t), hdl(h) {}
+  action(action_type t, connection_hdl h, server::message_ptr m)
+    : type(t), hdl(h), msg(m) {}
 
-    action_type type;
-    websocketpp::connection_hdl hdl;
-    server::message_ptr msg;
+  action_type type;
+  websocketpp::connection_hdl hdl;
+  server::message_ptr msg;
 };
 
-class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_observer, public command_observer, public motor_observer {
+class Alexo : public vl53l0x_observer, public gy271_observer, public command_observer, public motor_observer {
   public:
     Alexo();
     void init();
@@ -89,7 +85,6 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     void run();
     void process_messages();
     void update(vl53l0x_event& event);
-    void update(hcsr04_event& event);
     void update(gy271_event& event);
     void update(command_event& event);
     void update(motor_event& event);
@@ -108,7 +103,7 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     static int force_exit;
     static int pidFilehandle;
 
-    typedef std::set<connection_hdl,std::owner_less<connection_hdl> > con_list;
+    typedef std::set<connection_hdl,std::owner_less<connection_hdl>> con_list;
 
     server m_server;
     con_list m_connections;
@@ -118,8 +113,7 @@ class Alexo : public vl53l0x_observer, public hcsr04_observer, public gy271_obse
     mutex m_connection_lock;
     condition_variable m_action_cond;
 
-    //vl53l0x_worker vl53l0x{0};
-    //hcsr04_worker hcsr04{28, 29};
+    vl53l0x_worker vl53l0x{0};
     //gy271_worker gy271;
     pca9685 servo;
     mecanum_driver motorctrl{
@@ -195,20 +189,13 @@ void Alexo::update(motor_event& event){
 void Alexo::update(vl53l0x_event& event){
   websocketpp::lib::error_code ec;
 
-  //std::cout << "received distance: " << event.getDistance() << std::endl;
-  lock_guard<mutex> guard(m_connection_lock);
-
-  std::string msg;
-  message_handler::toJSON(event, msg);
-
-  con_list::iterator it;
-  for (it = m_connections.begin(); it != m_connections.end(); ++it) {
-    m_server.send(*it,msg,websocketpp::frame::opcode::text, ec);
+  if(event.getDistance() < config::get_instance().get_front_vl53l0x_stop_distance()){
+    std::cout << "vl53l0x stop trigger: "
+              << "[dist: " << event.getDistance() << "]"
+              << "[stop: " << config::get_instance().get_front_vl53l0x_stop_distance() << "]"
+              << std::endl;
+    motorctrl.stop();
   }
-}
-
-void Alexo::update(hcsr04_event& event){
-  websocketpp::lib::error_code ec;
 
   //std::cout << "received distance: " << event.getDistance() << std::endl;
   lock_guard<mutex> guard(m_connection_lock);
@@ -352,25 +339,6 @@ void Alexo::sigIntExHndlr(int sig)
 }
 
 void Alexo::init(){
-  int size = 0;
-  
-//  wiringPiSetupGpio();
-
-//  size = config::get_instance().getI2CSize();
-//  for(int i = 0; i < size; i++){
-//    shared_ptr<I2CConf> p = config::get_instance().getI2CConf(i);
-//    shared_ptr<PCA9685> pca = shared_ptr<PCA9685>(new PCA9685());
-//    pca->Setup(p->address, p->hertz);
-//    pca->PWMReset();
-//    tamageta::app_ctx::get_instance().add(pca);
-//  }
-//
-//  size = config::get_instance().getHcSr04ConfSize();
-//  for(int i = 0; i < size; i++){
-//    shared_ptr<HcSr04Conf> p = config::get_instance().getHcSr04Conf(i);
-//    shared_ptr<HcSr04> hcsr04 = shared_ptr<HcSr04>(new HcSr04(p->pinTrig, p->pinEcho));
-//    tamageta::app_ctx::get_instance().add(hcsr04);
-//  }
 }
 
 void Alexo::run(){
@@ -403,13 +371,11 @@ void Alexo::run(){
   m_server.start_accept();
 
   cout << "Alexo::run() ... before start vl53l0x\n" << endl;
-  //vl53l0x.add((*this));
-  //hcsr04.add((*this));
+  vl53l0x.add((*this));
   //gy271.add((*this));
   motorctrl.add((*this));
 
-  //vl53l0x.start();
-  //hcsr04.start();
+  vl53l0x.start();
   //gy271.start();
   motorctrl.start_monitor();
 
