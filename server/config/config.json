@@ -11,6 +11,9 @@
   ],
   "front_vl53l0x":{
     "address": "0x29",
+    "servo_id": "2",
+    "servo_min": "120",
+    "servo_max": "500",
     "stop_distance": 100
   },
   "motor_driver":{

@@ -45,6 +45,9 @@ void config::load(const char* filename){
   const char *cfront_vl53l0x = "front_vl53l0x";
   const char *cfront_vl53l0x_address = "address";
   const char *cfront_vl53l0x_stop_distance = "stop_distance";
+  const char *cfront_vl53l0x_servo_id = "servo_id";
+  const char *cfront_vl53l0x_servo_min = "servo_min";
+  const char *cfront_vl53l0x_servo_max = "servo_max";
 
   const char *cmotor_driver = "motor_driver";
 
@@ -148,12 +151,39 @@ void config::load(const char* filename){
 
   // front vl53l0x stop distance
   if (!front_vl53l0x.HasMember(cfront_vl53l0x_stop_distance)) {
-    throw runtime_error("front_vl53l0x_address_stop_distance is not configured!");
+    throw runtime_error("front_vl53l0x_stop_distance is not configured!");
   }
   if (!front_vl53l0x[cfront_vl53l0x_stop_distance].IsInt()) {
     throw runtime_error("front_vl53l0x_stop_distance must be integer!");
   }
   front_vl53l0x_stop_distance = front_vl53l0x[cfront_vl53l0x_stop_distance].GetInt();
+
+  // front vl53l0x servo id
+  if (!front_vl53l0x.HasMember(cfront_vl53l0x_servo_id)) {
+    throw runtime_error("front_vl53l0x_servo_id is not configured!");
+  }
+  if (!front_vl53l0x[cfront_vl53l0x_servo_id].IsInt()) {
+    throw runtime_error("front_vl53l0x_servo_id must be integer!");
+  }
+  front_vl53l0x_servo_id = front_vl53l0x[cfront_vl53l0x_servo_id].GetInt();
+
+  // front vl53l0x servo min
+  if (!front_vl53l0x.HasMember(cfront_vl53l0x_servo_min)) {
+    throw runtime_error("front_vl53l0x_servo_min is not configured!");
+  }
+  if (!front_vl53l0x[cfront_vl53l0x_servo_min].IsInt()) {
+    throw runtime_error("front_vl53l0x_servo_min must be integer!");
+  }
+  front_vl53l0x_servo_min = front_vl53l0x[cfront_vl53l0x_servo_min].GetInt();
+
+  // front vl53l0x servo max
+  if (!front_vl53l0x.HasMember(cfront_vl53l0x_servo_max)) {
+    throw runtime_error("front_vl53l0x_servo_max is not configured!");
+  }
+  if (!front_vl53l0x[cfront_vl53l0x_servo_max].IsInt()) {
+    throw runtime_error("front_vl53l0x_servo_max must be integer!");
+  }
+  front_vl53l0x_servo_max = front_vl53l0x[cfront_vl53l0x_servo_max].GetInt();
 
 
   // motor driver
