@@ -189,16 +189,22 @@ void Alexo::update(motor_event& event){
 void Alexo::update(vl53l0x_event& event){
   websocketpp::lib::error_code ec;
 
-  if(motorctrl.get_state() == mecanum_driver::STATE::FORWARD
-      && event.getDistance() < config::get_instance().get_front_vl53l0x_stop_distance()){
+  if(event.get_id() == 0 && motorctrl.is_forward()
+      && event.get_distance() < config::get_instance().get_front_vl53l0x_stop_distance()){
     std::cout << "vl53l0x stop trigger: "
-              << "[dist: " << event.getDistance() << "]"
+              << "[dist: " << event.get_distance() << "]"
               << "[stop: " << config::get_instance().get_front_vl53l0x_stop_distance() << "]"
               << std::endl;
     motorctrl.stop();
+    motorctrl.round_right();
+  } else if(motorctrl.get_state() == mecanum_driver::STATE::ROUND_RIGHT
+      && event.get_distance() > 300){
+    motorctrl.stop();
+    // need to confirm controller status before forward.
+    motorctrl.forward();
   }
 
-  //std::cout << "received distance: " << event.getDistance() << std::endl;
+  //std::cout << "received distance: " << event.get_distance() << std::endl;
   lock_guard<mutex> guard(m_connection_lock);
 
   std::string msg;

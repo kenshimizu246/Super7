@@ -43,15 +43,15 @@ public:
     int ret = clock_gettime(CLOCK_REALTIME, &ts);
     distance = 8096;
   }
-  uint16_t getID(){return id;}
-  uint16_t getDistance(){return distance;}
-  struct timespec getTime(){return ts;}
-  struct tm* getGMTime(){return gmtime(&ts.tv_sec);}
+  uint16_t get_id(){return id;}
+  uint16_t get_distance(){return distance;}
+  struct timespec get_time(){return ts;}
+  struct tm* get_gm_time(){return gmtime(&ts.tv_sec);}
   int getStrTime(char* b){
     //strftime(b, sizeof(b), "%D %T", gmtime(&ts.tv_sec));
     return strftime(b, sizeof(b), "%D %T", gmtime(&ts.tv_sec));
   }
-  vl53l0x_status getStatus(){return status;};
+  vl53l0x_status get_status(){return status;};
 
 private:
   uint16_t id;

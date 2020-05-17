@@ -120,15 +120,15 @@ void message_handler::toJSON(vl53l0x_event& event, std::string& s){
   Value header(kObjectType);
   header.AddMember("message-type", "event", allocator);
   header.AddMember("source", "vl53l0x", allocator);
-  header.AddMember("source-id", event.getID(), allocator);
+  header.AddMember("source-id", event.get_id(), allocator);
   d.AddMember("header", header, allocator);
 
   char buff[100];
-  int len = strftime(buff, sizeof(buff), "%D %T", event.getGMTime());
+  int len = strftime(buff, sizeof(buff), "%D %T", event.get_gm_time());
 
   Value body(kObjectType);
-  body.AddMember("distance", Value().SetFloat(event.getDistance()), allocator);
-  body.AddMember("status", event.getStatus(), allocator);
+  body.AddMember("distance", Value().SetFloat(event.get_distance()), allocator);
+  body.AddMember("status", event.get_status(), allocator);
   body.AddMember("timestamp", Value().SetString(buff, len, allocator), allocator);
   d.AddMember("body", body, allocator);
 

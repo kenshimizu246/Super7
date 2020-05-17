@@ -4,9 +4,12 @@
 #include <vector>
 #include <algorithm>
 
+#include "config.hpp"
 #include "pca9685.hpp"
 #include "motor_driver.hpp"
 #include "mecanum_driver.hpp"
+
+using namespace tamageta;
 
 #ifndef _command_hpp
 #define _command_hpp
@@ -84,12 +87,12 @@ public:
   const std::string kSLIDE_RIGHT = "SLIDE_RIGHT";
   const std::string kSLIDE_LEFT = "SLIDE_LEFT";
 
-  drive_command(mecanum_driver& m, drive_command_type s): motor(m), type(s), count(0) {}
-  drive_command(mecanum_driver& m, drive_command_type s, uint64_t count): motor(m), type(s), count(count) {}
-  drive_command(mecanum_driver& m, std::string& str): motor(m), count(0) {
+  drive_command(mecanum_driver& m, drive_command_type s, pca9685& servo): motor(m), type(s), count(0), servo(servo) {}
+  drive_command(mecanum_driver& m, drive_command_type s, uint64_t count, pca9685& servo): motor(m), type(s), count(count), servo(servo) {}
+  drive_command(mecanum_driver& m, std::string& str, pca9685& servo): motor(m), count(0), servo(servo) {
     setType(str);
   }
-  drive_command(mecanum_driver& m, std::string& str, uint64_t count): motor(m), count(count) {
+  drive_command(mecanum_driver& m, std::string& str, uint64_t count, pca9685& servo): motor(m), count(count), servo(servo) {
     setType(str);
   }
 
@@ -135,7 +138,15 @@ public:
               << "[count:" << count << "]"
               << std::endl;
     if (getType() == drive_command_type::FORWARD){
-      std::cout << "forward selected! " << "[count:" << count << "]" << std::endl;
+      std::cout << "forward selected! "
+        << "[count:" << count << "]"
+        << "[servo:" << config::get_instance().get_front_vl53l0x_servo_mid() << "]"
+        << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_mid()
+      );
       if(count > 0){
         motor.forward(count);
       } else {
@@ -143,6 +154,11 @@ public:
       }
     }else if (getType() == drive_command_type::BACKWARD){
       std::cout << "backward selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_mid()
+      );
       if(count > 0){
         motor.backward(count);
       } else {
@@ -150,6 +166,11 @@ public:
       }
     }else if (getType() == drive_command_type::RIGHT){
       std::cout << "right selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_mid()
+      );
       if(count > 0){
         motor.round_right(count);
       } else {
@@ -157,6 +178,11 @@ public:
       }
     }else if (getType() == drive_command_type::LEFT){
       std::cout << "left selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_mid()
+      );
       if(count > 0){
         motor.round_left(count);
       } else {
@@ -164,9 +190,21 @@ public:
       }
     }else if (getType() == drive_command_type::STOP){
       std::cout << "stop selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_mid()
+      );
       motor.stop();
     }else if (getType() == drive_command_type::FORWARD_RIGHT){
       std::cout << "forward right selected!" << std::endl;
+      uint16_t max = config::get_instance().get_front_vl53l0x_servo_max();
+      uint16_t min = config::get_instance().get_front_vl53l0x_servo_min();
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        ((max - min) * 0.25 + min)
+      );
       if(count > 0){
         motor.forward_right(count);
       } else {
@@ -174,6 +212,13 @@ public:
       }
     }else if (getType() == drive_command_type::FORWARD_LEFT){
       std::cout << "forward left selected!" << std::endl;
+      uint16_t max = config::get_instance().get_front_vl53l0x_servo_max();
+      uint16_t min = config::get_instance().get_front_vl53l0x_servo_min();
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        ((max - min) * 0.75 + min)
+      );
       if(count > 0){
         motor.forward_left(count);
       } else {
@@ -181,6 +226,13 @@ public:
       }
     }else if (getType() == drive_command_type::BACKWARD_RIGHT){
       std::cout << "backward right selected!" << std::endl;
+      uint16_t max = config::get_instance().get_front_vl53l0x_servo_max();
+      uint16_t min = config::get_instance().get_front_vl53l0x_servo_min();
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        ((max - min) * 0.75 + min)
+      );
       if(count > 0){
         motor.backward_right(count);
       } else {
@@ -188,6 +240,13 @@ public:
       }
     }else if (getType() == drive_command_type::BACKWARD_LEFT){
       std::cout << "backward left selected!" << std::endl;
+      uint16_t max = config::get_instance().get_front_vl53l0x_servo_max();
+      uint16_t min = config::get_instance().get_front_vl53l0x_servo_min();
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        ((max - min) * 0.25 + min)
+      );
       if(count > 0){
         motor.backward_left(count);
       } else {
@@ -195,6 +254,11 @@ public:
       }
     }else if (getType() == drive_command_type::SLIDE_RIGHT){
       std::cout << "slide right selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_min()
+      );
       if(count > 0){
         motor.slide_right(count);
       } else {
@@ -202,6 +266,11 @@ public:
       }
     }else if (getType() == drive_command_type::SLIDE_LEFT){
       std::cout << "slide left selected!" << std::endl;
+      servo.PwmWrite(
+        config::get_instance().get_front_vl53l0x_servo_id(),
+        0,
+        config::get_instance().get_front_vl53l0x_servo_max()
+      );
       if(count > 0){
         motor.slide_left(count);
       } else {
@@ -216,6 +285,7 @@ private:
   mecanum_driver& motor;
   drive_command_type type;
   uint64_t count;
+  pca9685& servo;
 };
 
 class servo_command_event : public command_event {
@@ -258,16 +328,16 @@ public:
     motor = m;
   }
   std::shared_ptr<command> createDriveCommand(std::string& s){
-    return std::shared_ptr<command>(new drive_command(motor, s));
+    return std::shared_ptr<command>(new drive_command(motor, s, servo));
   }
   std::shared_ptr<command> createDriveCommand(std::string& s, uint64_t count){
-    return std::shared_ptr<command>(new drive_command(motor, s, count));
+    return std::shared_ptr<command>(new drive_command(motor, s, count, servo));
   }
   std::shared_ptr<command> createDriveCommand(drive_command_type s){
-    return std::shared_ptr<command>(new drive_command(motor, s));
+    return std::shared_ptr<command>(new drive_command(motor, s, servo));
   }
   std::shared_ptr<command> createDriveCommand(drive_command_type s, uint64_t count){
-    return std::shared_ptr<command>(new drive_command(motor, s, count));
+    return std::shared_ptr<command>(new drive_command(motor, s, count, servo));
   }
   std::shared_ptr<command> createServoCommand(int id, unsigned int value){
     return std::shared_ptr<command>(new servo_command(servo, id, value));

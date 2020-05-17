@@ -134,6 +134,24 @@ public:
     return UNKNOWN;
   }
 
+  bool is_forward(){
+    if(FORWARD == get_state()
+        || FORWARD_RIGHT == get_state()
+        || FORWARD_LEFT == get_state()){
+      return true;
+    }
+    return false;
+  }
+
+  bool is_backward(){
+    if(BACKWARD == get_state()
+        || BACKWARD_RIGHT == get_state()
+        || BACKWARD_LEFT == get_state()){
+      return true;
+    }
+    return false;
+  }
+
   void init_mode(){
     fr_motor.init_mode();
     fl_motor.init_mode();

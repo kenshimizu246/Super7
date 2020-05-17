@@ -79,7 +79,8 @@ class config {
 
     uint16_t get_front_vl53l0x_servo_mid(){
       uint16_t mid = (get_front_vl53l0x_servo_max()
-                      - get_front_vl53l0x_servo_min()) / 2;
+                      - get_front_vl53l0x_servo_min()) / 2
+                      + get_front_vl53l0x_servo_min();
       return mid;
     }
 
