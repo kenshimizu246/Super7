@@ -24,7 +24,8 @@ enum drive_command_type {
   BACKWARD_LEFT,
   SLIDE_RIGHT,
   SLIDE_LEFT,
-  AUTO
+  AUTO,
+  UNKNOWN
 };
 
 class command_event {
