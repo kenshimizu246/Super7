@@ -51,10 +51,10 @@ void gy271_worker::update(
   }
 }
 
-void* gy271_worker::executeLauncher(void* args){
-  std::cout << "gy271_worker::executeLauncher()... start" << std::endl;
+void* gy271_worker::execute_launcher(void* args){
+  std::cout << "gy271_worker::execute_launcher()... start" << std::endl;
   reinterpret_cast<gy271_worker*>(args)->run();
-  std::cout << "gy271_worker::executeLauncher()... end" << std::endl;
+  std::cout << "gy271_worker::execute_launcher()... end" << std::endl;
 }
 
 void gy271_worker::start() {
@@ -65,7 +65,7 @@ void gy271_worker::start() {
     pthread_create(
       &(this->thread_handler),
       NULL,
-      gy271_worker::executeLauncher,
+      gy271_worker::execute_launcher,
       this
     );
     std::cout << "gy271_worker::start()... thread created" << std::endl;
@@ -100,7 +100,7 @@ int gy271_worker::check_status(int fd, int status){
   return 0;
 }
 
-void gy271_worker::initGpio(){
+void gy271_worker::init_gpio(){
   wiringPiSetupGpio();
 }
 

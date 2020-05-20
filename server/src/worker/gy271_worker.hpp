@@ -75,12 +75,12 @@ public:
     int ret = clock_gettime(CLOCK_REALTIME, &ts);
   }
 
-  float getHeading(){return heading;}
-  int getX(){return x;}
-  int getY(){return y;}
-  int getZ(){return z;}
-  gy271_status getStatus(){return status;};
-  struct tm* getGMTime(){return gmtime(&ts.tv_sec);}
+  float get_heading(){return heading;}
+  int get_x(){return x;}
+  int get_y(){return y;}
+  int get_z(){return z;}
+  gy271_status get_status(){return status;};
+  struct tm* get_gmtime(){return gmtime(&ts.tv_sec);}
 private:
   float heading;
   int x, y, z;
@@ -97,10 +97,10 @@ public:
 
 class gy271_worker{
 public:
-  void initGpio();
+  void init_gpio();
   void run();
   void start();
-  static void* executeLauncher(void* args);
+  static void* execute_launcher(void* args);
   void add(gy271_observer& o);
   void remove(gy271_observer& o);
   ~gy271_worker();

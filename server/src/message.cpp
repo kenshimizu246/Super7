@@ -174,14 +174,14 @@ void message_handler::toJSON(gy271_event& event, std::string& s){
   d.AddMember("header", header, allocator);
 
   char buff[100];
-  int len = strftime(buff, sizeof(buff), "%D %T", event.getGMTime());
+  int len = strftime(buff, sizeof(buff), "%D %T", event.get_gmtime());
 
   Value body(kObjectType);
-  body.AddMember("heading", Value().SetInt64(event.getHeading()), allocator);
-  body.AddMember("x", Value().SetInt64(event.getX()), allocator);
-  body.AddMember("y", Value().SetInt64(event.getY()), allocator);
-  body.AddMember("z", Value().SetInt64(event.getZ()), allocator);
-  body.AddMember("status", event.getStatus(), allocator);
+  body.AddMember("heading", Value().SetInt64(event.get_heading()), allocator);
+  body.AddMember("x", Value().SetInt64(event.get_x()), allocator);
+  body.AddMember("y", Value().SetInt64(event.get_y()), allocator);
+  body.AddMember("z", Value().SetInt64(event.get_z()), allocator);
+  body.AddMember("status", event.get_status(), allocator);
   body.AddMember("timestamp", Value().SetString(buff, len, allocator), allocator);
   d.AddMember("body", body, allocator);
 
