@@ -30,11 +30,11 @@ void vl53l0x_worker::update(uint16_t d){
 }
 
 
-uint16_t vl53l0x_worker::getDistance(){
+uint16_t vl53l0x_worker::get_distance(){
   return distance;
 }
 
-void vl53l0x_worker::setHighSpeed(bool b){
+void vl53l0x_worker::set_high_speed(bool b){
   if(b & high_accuracy){
     // throw exception
     // #error HIGH_SPEED and HIGH_ACCURACY cannot be both enabled at once!
@@ -42,7 +42,7 @@ void vl53l0x_worker::setHighSpeed(bool b){
   high_speed = b;
 }
 
-void vl53l0x_worker::setHighAccuracy(bool b){
+void vl53l0x_worker::set_high_accuracy(bool b){
   if(b & high_speed){
     // throw exception
     // #error HIGH_SPEED and HIGH_ACCURACY cannot be both enabled at once!
@@ -50,14 +50,14 @@ void vl53l0x_worker::setHighAccuracy(bool b){
   high_accuracy = b;
 }
 
-void vl53l0x_worker::setLongRange(bool b){
+void vl53l0x_worker::set_long_range(bool b){
   long_range = b;
 }
 
-void* vl53l0x_worker::executeLauncher(void* args){
-  std::cout << "vl53l0x_worker::executeLauncher()... start" << std::endl;
+void* vl53l0x_worker::execute_launcher(void* args){
+  std::cout << "vl53l0x_worker::execute_launcher()... start" << std::endl;
   reinterpret_cast<vl53l0x_worker*>(args)->run();
-  std::cout << "vl53l0x_worker::executeLauncher()... end" << std::endl;
+  std::cout << "vl53l0x_worker::execute_launcher()... end" << std::endl;
 }
 
 void vl53l0x_worker::start() {
@@ -68,7 +68,7 @@ void vl53l0x_worker::start() {
     pthread_create(
       &(this->thread_handler),
       NULL,
-      vl53l0x_worker::executeLauncher,
+      vl53l0x_worker::execute_launcher,
       this
     );
     std::cout << "vl53l0x_worker::start()... thread created" << std::endl;
@@ -138,9 +138,9 @@ void vl53l0x_worker::run() {
   }
 
   // Durations in nanoseconds
-  totalDuration = 0;
-  maxDuration = 0;
-  minDuration = 1000*1000*1000;
+  total_duration = 0;
+  max_duration = 0;
+  min_duration = 1000*1000*1000;
   // Initialize reference time measurement
   std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 
@@ -172,25 +172,25 @@ void vl53l0x_worker::run() {
     // Save current time as reference for next iteration
     t1 = t2;
     // Add total measurements duration
-    totalDuration += duration;
+    total_duration += duration;
     // Skip comparing first measurement against max and min as it's not a full iteration
     if (cnt == 0) {
       continue;
     }
     // Check and save max and min iteration duration
-    if (duration > maxDuration) {
-      maxDuration = duration;
+    if (duration > max_duration) {
+      max_duration = duration;
     }
-    if (duration < minDuration) {
-      minDuration = duration;
+    if (duration < min_duration) {
+      min_duration = duration;
     }
   }
 
   // Print duration data
-  //std::cout << "\nMax duration: " << maxDuration << "ns" << std::endl;
-  //std::cout << "Min duration: " << minDuration << "ns" << std::endl;
-  //std::cout << "Avg duration: " << totalDuration/(i+1) << "ns" << std::endl;
-  //std::cout << "Avg frequency: " << 1000000000/(totalDuration/(i+1)) << "Hz" << std::endl;
+  //std::cout << "\nMax duration: " << max_duration << "ns" << std::endl;
+  //std::cout << "Min duration: " << min_duration << "ns" << std::endl;
+  //std::cout << "Avg duration: " << total_duration/(i+1) << "ns" << std::endl;
+  //std::cout << "Avg frequency: " << 1000000000/(total_duration/(i+1)) << "Hz" << std::endl;
 }
 
 vl53l0x_worker::~vl53l0x_worker(){

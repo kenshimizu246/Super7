@@ -73,14 +73,14 @@ public:
   void init(){};
   void run();
   void start();
-  void setHighSpeed(bool b);
-  void setHighAccuracy(bool b);
-  void setLongRange(bool b);
-  uint16_t getDistance();
-  static void* executeLauncher(void* args);
+  void set_high_speed(bool b);
+  void set_high_accuracy(bool b);
+  void set_long_range(bool b);
+  uint16_t get_distance();
+  static void* execute_launcher(void* args);
   void add(vl53l0x_observer& o);
   void removex(vl53l0x_observer& o);
-  uint16_t getID();
+  uint16_t get_id();
 
   const static uint64_t DISTANCE_ERROR = 8096;
 
@@ -95,9 +95,9 @@ private:
   std::vector<vl53l0x_observer*> observers;
   void update(uint16_t d);
 
-  uint64_t totalDuration = 0;
-  uint64_t maxDuration = 0;
-  uint64_t minDuration = 1000*1000*1000;
+  uint64_t total_duration = 0;
+  uint64_t max_duration = 0;
+  uint64_t min_duration = 1000*1000*1000;
 
   pthread_t thread_handler;
   pthread_mutex_t mutex;
