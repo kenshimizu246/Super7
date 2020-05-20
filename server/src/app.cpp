@@ -114,7 +114,7 @@ class Alexo : public vl53l0x_observer, public gy271_observer, public command_obs
     condition_variable m_action_cond;
 
     vl53l0x_worker vl53l0x{0};
-    //gy271_worker gy271;
+    gy271_worker gy271;
     pca9685 servo;
     mecanum_driver motorctrl{
       config::get_instance().get_front_right_wheel_1(),
@@ -379,11 +379,11 @@ void Alexo::run(){
 
   cout << "Alexo::run() ... before start vl53l0x\n" << endl;
   vl53l0x.add((*this));
-  //gy271.add((*this));
+  gy271.add((*this));
   motorctrl.add((*this));
 
   vl53l0x.start();
-  //gy271.start();
+  gy271.start();
   motorctrl.start_monitor();
 
   // Start the ASIO io_service run loop
