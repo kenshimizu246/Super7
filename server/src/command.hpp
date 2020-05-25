@@ -8,6 +8,7 @@
 #include "pca9685.hpp"
 #include "motor_driver.hpp"
 #include "mecanum_driver.hpp"
+#include "auto_drive/auto_drive.hpp"
 
 using namespace tamageta;
 
@@ -87,13 +88,17 @@ public:
   const std::string kSLIDE_RIGHT = "SLIDE_RIGHT";
   const std::string kSLIDE_LEFT = "SLIDE_LEFT";
 
-  drive_command(mecanum_driver& m, drive_command_type s, pca9685& servo): motor(m), type(s), count(0), servo(servo) {}
-  drive_command(mecanum_driver& m, drive_command_type s, uint64_t count, pca9685& servo): motor(m), type(s), count(count), servo(servo) {}
-  drive_command(mecanum_driver& m, std::string& str, pca9685& servo): motor(m), count(0), servo(servo) {
-    setType(str);
+  drive_command(mecanum_driver& m, drive_command_type s, pca9685& p, vl53l0x_worker& v, gy271_worker& g)
+          : motor(m), type(s), count(0), servo(p), vl53l0x(v), gy271(g) {}
+  drive_command(mecanum_driver& m, drive_command_type s, uint64_t c, pca9685& p, vl53l0x_worker& v, gy271_worker& g)
+          : motor(m), type(s), count(c), servo(p), vl53l0x(v), gy271(g) {}
+  drive_command(mecanum_driver& m, std::string& s, pca9685& p, vl53l0x_worker& v, gy271_worker& g)
+          : motor(m), count(0), servo(p), vl53l0x(v), gy271(g) {
+    setType(s);
   }
-  drive_command(mecanum_driver& m, std::string& str, uint64_t count, pca9685& servo): motor(m), count(count), servo(servo) {
-    setType(str);
+  drive_command(mecanum_driver& m, std::string& s, uint64_t c, pca9685& p, vl53l0x_worker& v, gy271_worker& g)
+          : motor(m), count(c), servo(p), vl53l0x(v), gy271(g) {
+    setType(s);
   }
 
   void setType(std::string& str){
@@ -277,15 +282,29 @@ public:
         motor.slide_left();
       }
     }else if (getType() == drive_command_type::AUTO){
-      std::cout << "else selected!" << std::endl;
+      std::cout << "auto selected!" << std::endl;
+      shared_ptr<drive_action> check_action = shared_ptr<check_and_forward_action>(new check_and_forward_action(motor, servo, vl53l0x, gy271));
+      shared_ptr<drive_action> move_action = shared_ptr<drive_action>(new move_forward_action(motor, servo, vl53l0x, gy271, mecanum_driver::STATE::UNKNOWN, 100));
+
+      check_action->set_next_action(move_action);
+      move_action->set_next_action(check_action);
+
+      shared_ptr<drive_action> action = check_action;
+      while(action != nullptr){
+        action->do_action();
+        action = action->get_next_action();
+      }      
     }
   }
 
 private:
   mecanum_driver& motor;
   drive_command_type type;
+
   uint64_t count;
   pca9685& servo;
+  vl53l0x_worker& vl53l0x;
+  gy271_worker& gy271;
 };
 
 class servo_command_event : public command_event {
@@ -320,7 +339,8 @@ private:
 
 class command_factory {
 public:
-  command_factory(pca9685& s, mecanum_driver& m): servo(s), motor(m) {}
+  command_factory(pca9685& s, mecanum_driver& m, vl53l0x_worker& v, gy271_worker& g) 
+        : servo(s), motor(m), vl53l0x(v), gy271(g) {}
   void set(pca9685& s){
     servo = s;
   }
@@ -328,16 +348,16 @@ public:
     motor = m;
   }
   std::shared_ptr<command> createDriveCommand(std::string& s){
-    return std::shared_ptr<command>(new drive_command(motor, s, servo));
+    return std::shared_ptr<command>(new drive_command(motor, s, servo, vl53l0x, gy271));
   }
   std::shared_ptr<command> createDriveCommand(std::string& s, uint64_t count){
-    return std::shared_ptr<command>(new drive_command(motor, s, count, servo));
+    return std::shared_ptr<command>(new drive_command(motor, s, count, servo, vl53l0x, gy271));
   }
   std::shared_ptr<command> createDriveCommand(drive_command_type s){
-    return std::shared_ptr<command>(new drive_command(motor, s, servo));
+    return std::shared_ptr<command>(new drive_command(motor, s, servo, vl53l0x, gy271));
   }
   std::shared_ptr<command> createDriveCommand(drive_command_type s, uint64_t count){
-    return std::shared_ptr<command>(new drive_command(motor, s, count, servo));
+    return std::shared_ptr<command>(new drive_command(motor, s, count, servo, vl53l0x, gy271));
   }
   std::shared_ptr<command> createServoCommand(int id, unsigned int value){
     return std::shared_ptr<command>(new servo_command(servo, id, value));
@@ -345,6 +365,8 @@ public:
 private:
   pca9685& servo;
   mecanum_driver& motor;
+  vl53l0x_worker& vl53l0x;
+  gy271_worker& gy271;
 };
 
 #endif

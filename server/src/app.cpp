@@ -47,6 +47,7 @@ using websocketpp::lib::condition_variable;
 #include "config.hpp"
 #include "worker/vl53l0x_worker.hpp"
 #include "worker/gy271_worker.hpp"
+#include "auto_drive/auto_drive.hpp"
 #include "message.hpp"
 #include "pca9685.hpp"
 #include "mecanum_driver.hpp"
@@ -134,7 +135,8 @@ class Alexo : public vl53l0x_observer, public gy271_observer, public command_obs
       config::get_instance().get_rear_left_sensor_1(),
       config::get_instance().get_rear_left_sensor_2()
     };
-    command_factory cmd_factory{servo, motorctrl};
+    auto_drive autodrive{servo, motorctrl, vl53l0x, gy271};
+    command_factory cmd_factory{servo, motorctrl, vl53l0x, gy271};
 };
 
 int Alexo::force_exit = 0;
@@ -382,8 +384,9 @@ void Alexo::run(){
   gy271.add((*this));
   motorctrl.add((*this));
 
-  vl53l0x.start();
-  gy271.start();
+  autodrive.start();
+  //vl53l0x.start();
+  //gy271.start();
   motorctrl.start_monitor();
 
   // Start the ASIO io_service run loop

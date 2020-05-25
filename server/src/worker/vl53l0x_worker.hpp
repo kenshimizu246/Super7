@@ -79,7 +79,7 @@ public:
   uint16_t get_distance();
   static void* execute_launcher(void* args);
   void add(vl53l0x_observer& o);
-  void removex(vl53l0x_observer& o);
+  void remove(vl53l0x_observer& o);
   uint16_t get_id();
 
   const static uint64_t DISTANCE_ERROR = 8096;

@@ -18,7 +18,7 @@ void vl53l0x_worker::add(vl53l0x_observer& o){
   observers.push_back(&o);
 }
 
-void vl53l0x_worker::removex(vl53l0x_observer& o){
+void vl53l0x_worker::remove(vl53l0x_observer& o){
   observers.erase(std::remove(observers.begin(), observers.end(), &o));
 }
 
