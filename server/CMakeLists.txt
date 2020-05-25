@@ -28,6 +28,7 @@ src/worker/gy271_worker.cpp
 src/pca9685.cpp
 src/message.cpp
 src/motor_driver.cpp
+src/auto_drive/auto_drive.cpp
 	)
 target_link_libraries(super7
 	pthread
