@@ -4,6 +4,8 @@
 void motor_driver::init_mode(){
   stop_cnt = 0;
 
+  std::cout << "motor_driver::init_mode()! " << std::endl;
+
   pinMode(motor_1, OUTPUT);
   pinMode(motor_2, OUTPUT);
 
@@ -120,7 +122,7 @@ void motor_driver::start_monitor(){
       << " [id:" << id << "] "
       << ret << std::endl;
   }
-  std::cout << "motor_driver::start_monitor()... join"
+  std::cout << "motor_driver::start_monitor()... detach"
     << " [id:" << id << "] "
     << std::endl;
   ret = pthread_detach(this->thread_handler);

@@ -77,13 +77,16 @@ public:
          sensor_2(sensor_2) {
   }
   ~motor_driver(){
-    stop_monitor = false;
+    std::cout << "~motor_driver: start..." << std::endl;
+
+    stop_monitor = true;
     int ret = pthread_cancel(this->thread_handler);
     if(ret != 0){
       std::cout << "motor_driver::start()... cancel:" << ret << std::endl;
     }
 
     observers.clear();
+    std::cout << "~motor_driver: end." << std::endl;
   }
 
   enum STATE {
