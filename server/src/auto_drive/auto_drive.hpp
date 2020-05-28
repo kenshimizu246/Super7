@@ -71,7 +71,10 @@ public:
   vl53l0x_worker& vl53l0x;
   gy271_worker& gy271;
 
-  drive_action(mecanum_driver& m, pca9685& s, vl53l0x_worker& v, gy271_worker& g) : driver(m), servo(s), vl53l0x(v), gy271(g) {
+  drive_action(mecanum_driver& m, pca9685& s, vl53l0x_worker& v, gy271_worker& g)
+              : driver(m), servo(s), vl53l0x(v), gy271(g) {
+    pthread_mutex_init(&(this->mutex), NULL);
+    pthread_cond_init(&(this->cv), NULL);
     vl53l0x.add(*this);
     gy271.add(*this);
   }
@@ -83,12 +86,8 @@ public:
   virtual void set_next_action(shared_ptr<drive_action> action) = 0;
   virtual shared_ptr<drive_action> get_next_action() = 0;
 
-  void update(vl53l0x_event& event){
-  }
-  void update(gy271_event& event){
-  }
   void start(){
-    pthread_mutex_init(&(this->mutex), NULL);
+    std::cout << "drive_action::start start" << std::endl;
     int ret = pthread_create(
       &(this->thread_handler),
       NULL,
@@ -96,6 +95,7 @@ public:
       this
     );
     pthread_join(this->thread_handler, NULL);
+    std::cout << "drive_action::start end" << std::endl;
   }
 
   pthread_t thread_handler;
@@ -181,6 +181,8 @@ private:
 class round_action : public drive_action {
 public:
   void update(vl53l0x_event& event){
+    std::cout << "round_action : vl53l0x event:" << event.get_distance() << std::endl;
+
     pthread_mutex_lock(&(this->mutex));
     if(distance < event.get_distance() && !stop){
       stop = true;
@@ -213,15 +215,24 @@ private:
 
 class check_and_forward_action : public drive_action {
 public:
-  check_and_forward_action(mecanum_driver& m, pca9685& s, vl53l0x_worker& v, gy271_worker& g) : drive_action(m, s, v, g) {}
+  check_and_forward_action(mecanum_driver& m, pca9685& s, vl53l0x_worker& v, gy271_worker& g)
+         : drive_action(m, s, v, g) {}
+
   void update(vl53l0x_event& event){
+    std::cout << "check_and_forward_action:vl53l0x_evnet: lock :" << event.get_distance()  << std::endl;
     pthread_mutex_lock(&(this->mutex));
+    std::cout << "check_and_forward_action:vl53l0x_evnet: locked read:" << read << std::endl;
     if(!read){
+      std::cout << "check_and_forward_action:vl53l0x_evnet: read distance" << std::endl;
       distance = event.get_distance();
+      std::cout << "check_and_forward_action:vl53l0x_evnet: distance is " << distance << std::endl;
       read = true;
       pthread_cond_signal(&(this->cv));
+      std::cout << "check_and_forward_action:vl53l0x_evnet: condition signal" << std::endl;
     }
+    std::cout << "check_and_forward_action:vl53l0x_evnet: before unlock" << std::endl;
     pthread_mutex_unlock(&(this->mutex));
+    std::cout << "check_and_forward_action:vl53l0x_evnet: after unlock" << std::endl;
   }
   void update(gy271_event& event){
   }
@@ -233,21 +244,30 @@ public:
     uint16_t mm = 0;
     state = mecanum_driver::STATE::STOP;
 
+    std::cout << "check_and_forward_action:do_action: start" << std::endl;
+
     // SLIDE_RIGHT
     servo.PwmWrite(id, 0, min);
+    sleep(1);
+    std::cout << "check_and_forward_action:do_action: before lock" << std::endl;
     pthread_mutex_lock(&(this->mutex));
+    std::cout << "check_and_forward_action:do_action: after lock" << std::endl;
     read = false;
     while(!read){
+      std::cout << "check_and_forward_action:do_action: cond wait" << std::endl;
       pthread_cond_wait(&(this->cv),&(this->mutex));
     }
+    std::cout << "check_and_forward_action:do_action: read" << std::endl;
     if(mm < distance){
       mm = distance;
       state = mecanum_driver::STATE::SLIDE_RIGHT;
     }
     pthread_mutex_unlock(&(this->mutex));
+    std::cout << "check_and_forward_action:do_action: unlock" << std::endl;
 
     // FORWARD_RIGHT
     servo.PwmWrite(id, 0, ((max - min) * 0.25 + min));
+    sleep(1);
     pthread_mutex_lock(&(this->mutex));
     read = false;
     while(!read){
@@ -261,6 +281,7 @@ public:
 
     // FORWARD
     servo.PwmWrite(id, 0, ((max - min) * 0.5 + min));
+    sleep(1);
     pthread_mutex_lock(&(this->mutex));
     read = false;
     while(!read){
@@ -274,6 +295,7 @@ public:
 
     // FORWARD_LEFT
     servo.PwmWrite(id, 0, ((max - min) * 0.75 + min));
+    sleep(1);
     pthread_mutex_lock(&(this->mutex));
     read = false;
     while(!read){
@@ -287,6 +309,7 @@ public:
 
     // SLIDE_LEFT
     servo.PwmWrite(id, 0, max);
+    sleep(1);
     pthread_mutex_lock(&(this->mutex));
     read = false;
     while(!read){
@@ -297,13 +320,17 @@ public:
       state = mecanum_driver::STATE::SLIDE_LEFT;
     }
     pthread_mutex_unlock(&(this->mutex));
+
+    std::cout << "check_and_forward_action: do_action done" << std::endl;
   }
 
   shared_ptr<drive_action> get_next_action(){
     if(state == mecanum_driver::STATE::STOP
         || state == mecanum_driver::STATE::UNKNOWN){
+      std::cout << "check_and_forward_action: return nullptr" << std::endl;
       return nullptr;
     }
+    std::cout << "check_and_forward_action: set state:" << state << std::endl;
     next_action->set_state(state);
     return next_action;
   }
@@ -318,38 +345,32 @@ private:
   shared_ptr<move_forward_action> next_action;
 };
 
-class auto_drive : public vl53l0x_observer, public gy271_observer {
+class auto_drive {
 public:
-  auto_drive(pca9685& s, mecanum_driver& d, vl53l0x_worker& v, gy271_worker& g)
-    : servo(s), driver(d), vl53l0x(v), gy271(g) {}
+  auto_drive() {}
   ~auto_drive(){};
   void run();
   void start();
   void add(auto_drive_observer& o);
   void remove(auto_drive_observer& o);
-  void update(vl53l0x_event& event);
-  void update(gy271_event& event);
+  void add(shared_ptr<drive_action> action);
+  void stop_auto_drive();
+  void stop_action_queue();
+  void empty_queue();
 
 private:
-  volatile bool stop = false;
+  volatile bool stop_main = false;
+  volatile bool action_loop_stop = false;
   std::vector<auto_drive_observer*> observers;
 
   std::mutex action_lock;
-  std::queue<std::shared_ptr<drive_action>> drive_actions;
-
-  pca9685& servo;
-  mecanum_driver& driver;
-  vl53l0x_worker& vl53l0x;
-  gy271_worker& gy271;
+  std::queue<std::shared_ptr<drive_action>> action_queue;
 
   static void* execute_launcher(void* args);
-  void update();
-  unsigned int get_gmtime();
 
   pthread_t thread_handler;
   pthread_mutex_t mutex;
   pthread_cond_t cv;
-  pthread_condattr_t cattr;
 };
 
 #endif

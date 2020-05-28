@@ -24,13 +24,6 @@ void auto_drive::remove(auto_drive_observer& o){
   observers.erase(std::remove(observers.begin(), observers.end(), &o));
 }
 
-void auto_drive::update(){
-  auto_drive_event e;
-  for(auto* o : observers){
-    o->update(e);
-  }
-}
-
 void* auto_drive::execute_launcher(void* args){
   std::cout << "auto_drive::execute_launcher()... start" << std::endl;
   reinterpret_cast<auto_drive*>(args)->run();
@@ -40,6 +33,7 @@ void* auto_drive::execute_launcher(void* args){
 void auto_drive::start() {
   std::cout << "auto_drive::start()..." << std::endl;
   pthread_mutex_init(&(this->mutex), NULL);
+  pthread_cond_init(&(this->cv), NULL);
   pthread_create(
     &(this->thread_handler),
     NULL,
@@ -51,34 +45,72 @@ void auto_drive::start() {
   std::cout << "auto_drive::start()... thread detached" << std::endl;
 }
 
-void auto_drive::update(vl53l0x_event& event){
-  //latest_vl53l0x_event = event;
+void auto_drive::empty_queue(){
+  pthread_mutex_lock(&(this->mutex));
+  while(!action_queue.empty()){
+    action_queue.pop();
+  }
+  pthread_cond_signal(&(this->cv));
+  pthread_mutex_unlock(&(this->mutex));
 }
 
-void auto_drive::update(gy271_event& event){
-  //latest_gy271_event = event;
+void auto_drive::stop_action_queue(){
+  action_loop_stop = false;
+}
+
+void auto_drive::stop_auto_drive(){
+  pthread_mutex_lock(&(this->mutex));
+  stop_main = false;
+  pthread_cond_signal(&(this->cv));
+  pthread_mutex_unlock(&(this->mutex));
+}
+
+void auto_drive::add(shared_ptr<drive_action> action){
+  std::cout << "aut_drive::add start" << std::endl;
+  pthread_mutex_lock(&(this->mutex));
+  std::cout << "aut_drive::add locked" << std::endl;
+  action_queue.push(action);
+  std::cout << "aut_drive::add pushed" << std::endl;
+  pthread_cond_signal(&(this->cv));
+  std::cout << "aut_drive::add signaled" << std::endl;
+  pthread_mutex_unlock(&(this->mutex));
+  std::cout << "aut_drive::add unlocked" << std::endl;
 }
 
 void auto_drive::run() {
   std::cout << "auto_drive::run(): start..." << std::endl;
 
-  if (stop) {
+  if (stop_main) {
     std::cerr << "Stop Flag is true!" << std::endl;
     return;
   }
 
-//  std::shared_ptr<drive_action> action(new forward_action(driver));
-//  drive_actions.push(action);
-
   std::cout << "auto_drive::run(): start loop" << std::endl;
-  int cnt = 0;
-  for (;!stop; ++cnt) {
-    //usleep(1*1000000);
-    std::cout << "before front..." << std::endl;
-    std::shared_ptr<drive_action> action = drive_actions.front();
-    std::cout << "after front..." << std::endl;
-    //drive_actions.pop();
-    //action->do_action();
+  while (!stop_main) {
+    std::cout << "auto_drive::run lock..." << std::endl;
+    pthread_mutex_lock(&(this->mutex));
+    std::cout << "auto_drive::run check queue..." << std::endl;
+    while(action_queue.empty() && !stop_main){
+      std::cout << "auto_drive::run wait..." << std::endl;
+      pthread_cond_wait(&(this->cv), &(this->mutex));
+      std::cout << "auto_drive::run wait exit" << std::endl;
+    }
+    std::cout << "auto_drive::run front" << std::endl;
+    std::shared_ptr<drive_action> action = action_queue.front();
+    std::cout << "auto_drive::run pop" << std::endl;
+    action_queue.pop();
+    action_loop_stop = false;
+    std::cout << "auto_drive::run unlock" << std::endl;
+    pthread_mutex_unlock(&(this->mutex));
+
+    std::cout << "auto_drive::run before action loop" << std::endl;
+    while(action != nullptr && !action_loop_stop && !stop_main){
+      std::cout << "auto_drive::run do_action" << std::endl;
+      action->do_action();
+      std::cout << "auto_drive::run do_action done" << std::endl;
+      action = action->get_next_action();
+      std::cout << "auto_drive::run do_action next action" << std::endl;
+    }
   }
 }
 

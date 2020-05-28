@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "config.hpp"
+#include "app_ctx.hpp"
 #include "pca9685.hpp"
 #include "motor_driver.hpp"
 #include "mecanum_driver.hpp"
@@ -289,11 +290,15 @@ public:
       check_action->set_next_action(move_action);
       move_action->set_next_action(check_action);
 
-      shared_ptr<drive_action> action = check_action;
-      while(action != nullptr){
-        action->do_action();
-        action = action->get_next_action();
-      }      
+      std::cout << "add auto action!" << std::endl;
+      app_ctx::get_instance().get_auto_drive()->add(check_action);
+      std::cout << "added auto action!" << std::endl;
+
+      //shared_ptr<drive_action> action = check_action;
+      //while(action != nullptr){
+      //  action->do_action();
+      //  action = action->get_next_action();
+      //}      
     }
   }
 

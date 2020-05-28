@@ -45,6 +45,7 @@ using websocketpp::lib::unique_lock;
 using websocketpp::lib::condition_variable;
 
 #include "config.hpp"
+#include "app_ctx.hpp"
 #include "worker/vl53l0x_worker.hpp"
 #include "worker/gy271_worker.hpp"
 #include "auto_drive/auto_drive.hpp"
@@ -135,7 +136,7 @@ class Alexo : public vl53l0x_observer, public gy271_observer, public command_obs
       config::get_instance().get_rear_left_sensor_1(),
       config::get_instance().get_rear_left_sensor_2()
     };
-    auto_drive autodrive{servo, motorctrl, vl53l0x, gy271};
+    auto_drive autodrive;
     command_factory cmd_factory{servo, motorctrl, vl53l0x, gy271};
 };
 
@@ -146,6 +147,13 @@ Alexo::Alexo() {
   force_exitx = 0;
 
   wiringPiSetup(); // use wiringPi
+
+  app_ctx::get_instance().init(
+    &servo,
+    &motorctrl,
+    &vl53l0x,
+    &gy271,
+    &autodrive);
 
   motorctrl.init_mode();
   servo.PwmSetup(0x40, 50);
@@ -385,7 +393,7 @@ void Alexo::run(){
   motorctrl.add((*this));
 
   autodrive.start();
-  //vl53l0x.start();
+  vl53l0x.start();
   //gy271.start();
   motorctrl.start_monitor();
 
