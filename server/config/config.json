@@ -1,7 +1,7 @@
 {
-  "appdir": "/home/pi/project/Alexo",
-  "pidfile": "/run/Alexo.pid",
-  "logdir": "/home/pi/project/Alexo",
+  "appdir": "/home/pi/project/Super7",
+  "pidfile": "/run/super7.pid",
+  "logdir": "/home/pi/project/Super7",
   "port": 9009,
   "daemon": false,
   "i2c":[{
