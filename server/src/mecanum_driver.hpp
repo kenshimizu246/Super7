@@ -46,6 +46,10 @@ public:
     rl_motor.add((*this));
   }
 
+  ~mecanum_driver(){
+    std::cout << "~mecanum_driver: end" << std::endl;
+  }
+
   void update(motor_event& event){
     std::cout << "mecanum_driver:update:"
       << "[id:" << event.get_id() << "]"
