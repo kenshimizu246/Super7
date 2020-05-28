@@ -194,7 +194,17 @@ void vl53l0x_worker::run() {
 }
 
 vl53l0x_worker::~vl53l0x_worker(){
+  stop = true;
 
+  std::cout << "~vl53l0x_worker: start." << std::endl;
+
+  int ret = pthread_cancel(this->thread_handler);
+  if(ret != 0){
+    std::cout << "vl53l0x_worker::start()... cancel:" << ret << std::endl;
+  }
+
+  observers.clear();
+  std::cout << "~vl53l0x_worker: end." << std::endl;
 }
 
 
