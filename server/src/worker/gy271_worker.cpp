@@ -42,40 +42,16 @@ void gy271_worker::update(
         int x, int y, int z,
         gy271_status s
       ) {
-  gy271_event e(
-    heading,
-    x, y, z,
-    s);
-  for(auto* o : observers){
-    o->update(e);
+  if(!get_stop()){
+    gy271_event e(
+      heading,
+      x, y, z,
+      s);
+    for(auto* o : observers){
+      o->update(e);
+    }
   }
 }
-
-void* gy271_worker::execute_launcher(void* args){
-  std::cout << "gy271_worker::execute_launcher()... start" << std::endl;
-  reinterpret_cast<gy271_worker*>(args)->run();
-  std::cout << "gy271_worker::execute_launcher()... end" << std::endl;
-}
-
-void gy271_worker::start() {
-  std::cout << "gy271_worker::start()..." << std::endl;
-//  if((this->thread_handler) == NULL){
-    std::cout << "gy271_worker::start()... thread init" << std::endl;
-    pthread_mutex_init(&(this->mutex), NULL);
-    pthread_create(
-      &(this->thread_handler),
-      NULL,
-      gy271_worker::execute_launcher,
-      this
-    );
-    std::cout << "gy271_worker::start()... thread created" << std::endl;
-    pthread_detach(this->thread_handler);
-    std::cout << "gy271_worker::start()... thread detached" << std::endl;
-//  }else{
-//    std::cout << "gy271_worker::start()... thread_handler is not null" << std::endl;
-//  }
-}
-
 
 int gy271_worker::check_status(int fd, int status){
   // DRDY: “0”: no new data, “1”: new data is ready
@@ -116,32 +92,33 @@ void gy271_worker::run(){
 
   int ret = wiringPiI2CWriteReg8(fd, 0x0b, 0x01);
   if(ret < 0){
-    throw gy271_error("Error : Reset failed!");
+    throw gy271_error("Error : Reset failed! writing 0x01 to 0x0b!");
   }
 
   ret = wiringPiI2CWriteReg8(fd, 0x0a, 0x80);
   if(ret < 0){
-    throw gy271_error("Error : Soft Reset failed!");
+    throw gy271_error("Error : Soft Reset failed! writing 0x80 to 0x0a");
   }
 
-  int ctrl = MODE_CONTINUOUS | ODR_200HZ | RNG_8G | OSR_512;
+  //int ctrl = MODE_CONTINUOUS | ODR_200HZ | RNG_8G | OSR_512;
+  int ctrl = MODE_CONTINUOUS | ODR_10HZ | RNG_8G | OSR_256;
   printf("GY-271: ctrl %x\n", ctrl);
   ret = wiringPiI2CWriteReg8(fd, 0x09, ctrl);
   if(ret < 0){
     //throw gy271_error("Error %d\n", ret);
-    throw gy271_error("Error");
+    throw gy271_error("Error writing 0x09");
   }
 
   unsigned int lowX, highX, lowY, highY, lowZ, highZ;
   lowX = lowY = lowZ = 0xffff;
   highX = highY = highZ = 0;
 
-  while(!stop){
+  while(!get_stop()){
     int status;
     //printf("GY-271: start and reading status\n");
     do{
       status = wiringPiI2CReadReg8(fd, 0x06);
-    } while((status & 0x01) != 1 && !stop);
+    } while((status & 0x01) != 1 && !get_stop());
     //printf("GY-271 will check the status\n");
     // DRDY: “0”: no new data, “1”: new data is ready
     if((status & 0x01) > 0){
@@ -154,17 +131,20 @@ void gy271_worker::run(){
 
     // OVL: “0”: normal, “1”: data overflow
     if((status & 0x02) > 0){
-      printf("GY-271: data overflow!\n");
-      update(-1, -1, -1, -1, gy271_status::GY271_DATA_OVERFLOW);
-      continue;
+      //printf("GY-271: data overflow!\n");
+      printf("o");
+      //update(-1, -1, -1, -1, gy271_status::GY271_DATA_OVERFLOW);
+      //continue;
     }
 
     // DOR: “0”: normal, “1”: data skipped for reading
     if((status & 0x04) > 0){
-      printf("GY-271: Data skipped for reading!\n");
-      //continue;
+      //printf("GY-271: Data skipped for reading!\n");
+      printf("s");
+      continue;
     } else {
-      printf("GY-271: Data skip (DOR) bit is normal!\n");
+      //printf("\nGY-271: Data skip (DOR) bit is normal!\n");
+      printf(",\n");
     }
     int lsbX = wiringPiI2CReadReg8(fd, 0x00);
     int msbX = wiringPiI2CReadReg8(fd, 0x01);
@@ -209,10 +189,4 @@ void gy271_worker::run(){
     //usleep(1000000); //1sec
   }
 }
-
-
-gy271_worker::~gy271_worker(){
-
-}
-
 

@@ -20,6 +20,8 @@
 #include <wiringPi.h>
 #include <wiringPiI2C.h>
 
+#include "worker.hpp"
+
 #ifndef _gy271_worker_hpp
 #define _gy271_worker_hpp
 
@@ -95,19 +97,15 @@ public:
   virtual void update(gy271_event&) = 0;
 };
 
-class gy271_worker{
+class gy271_worker : public worker{
 public:
   void init_gpio();
   void run();
-  void start();
-  static void* execute_launcher(void* args);
   void add(gy271_observer& o);
   void remove(gy271_observer& o);
-  ~gy271_worker();
 
 private:
   int fd;
-  volatile bool stop = false;
 
   std::vector<gy271_observer*> observers;
   pthread_t thread_handler;
